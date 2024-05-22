@@ -6,18 +6,18 @@ import '../screen/articledetail_view.dart';
 class ArticleCard extends StatelessWidget {
   const ArticleCard({
     super.key,
-    required this.context,
     required this.title,
     required this.author,
     required this.date,
     required this.imageUrl,
+    //required this.content, // Tambahkan konten artikel
   });
 
-  final BuildContext context;
   final String title;
   final String author;
   final String date;
   final String imageUrl;
+  //final String content; // Tambahkan konten artikel
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,15 @@ class ArticleCard extends StatelessWidget {
         onTap: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const ArticleDetailPage(title: '', author: '', date: '', imageUrl: '', content: '',)),
+            MaterialPageRoute(
+              builder: (context) => ArticleDetailPage(
+                title: title,
+                author: author,
+                date: date,
+                imageUrl: imageUrl,
+                //content: content, // Tambahkan konten artikel
+              ),
+            ),
           );
         },
         child: Column(

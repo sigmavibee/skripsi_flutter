@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:stunting_project/components/app_text_styles.dart';
 import 'package:stunting_project/components/colors.dart';
-import 'package:stunting_project/features/home/widget/articlepopular_widget.dart';
-
-import '../../article/screen/article_view.dart';
-import '../../gizi/screen/gizi_view.dart';
+import 'package:stunting_project/features/article/widget/articlecard_widget.dart';
+import 'package:stunting_project/features/home/widget/profilecard_widget.dart';
+import '../../../data/article/listarticle_models.dart';
 import '../widget/banner_widget.dart';
-import '../widget/profilecard_widget.dart'; // Import GiziPage
+import '../../article/screen/article_view.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key});
+  const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +17,7 @@ class HomePage extends StatelessWidget {
 }
 
 class HomeFull extends StatefulWidget {
-  const HomeFull({Key? key});
+  const HomeFull({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _HomeFull();
@@ -30,19 +29,13 @@ class _HomeFull extends State<HomeFull> {
 
   Future<void> _onItemTapped(int index) async {
     if (index == 2 || index == 3 || index == 4) {
-      // Save the current index before navigating
       int previousIndex = _selectedIndex;
-
-      // Navigate to the new page and wait for the result
       final result = await Navigator.pushNamed(context, _getRouteName(index));
-
-      // Check if a result was returned and set the _selectedIndex accordingly
       if (result != null && result is int) {
         setState(() {
           _selectedIndex = result;
         });
       } else {
-        // If no result is returned, go back to the previous index
         setState(() {
           _selectedIndex = previousIndex;
         });
@@ -101,7 +94,17 @@ class _HomeFull extends State<HomeFull> {
                 ProfileCard(),
                 BannerWidget(),
                 Expanded(
-                  child: ArticlePopularCard(context: context, title: 'The Importance of Healthy Eating', author: 'John Doe', date: 'May 1, 2024', imageUrl: 'https://via.placeholder.com/150'
+                  child: ListView.builder(
+                    itemCount: articles.length,
+                    itemBuilder: (context, index) {
+                      final article = articles[index];
+                      return ArticleCard(
+                        title: article.title,
+                        author: article.author,
+                        date: article.date,
+                        imageUrl: article.imageUrl,
+                      );
+                    },
                   ),
                 ),
               ],
@@ -140,4 +143,3 @@ class _HomeFull extends State<HomeFull> {
     );
   }
 }
-

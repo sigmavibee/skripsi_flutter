@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../widget/articlecard_widget.dart';
-import 'articledetail_view.dart';
+import '../../../data/article/listarticle_models.dart';
 
 class ArticlePage extends StatelessWidget {
   @override
@@ -9,15 +9,20 @@ class ArticlePage extends StatelessWidget {
     return Scaffold(
       body: ListView(
         padding: const EdgeInsets.all(16),
-        children: [
-          ArticleCard(context: context, title: 'The Importance of Healthy Eating', author: 'John Doe', date: 'May 1, 2024', imageUrl: 'https://via.placeholder.com/150'),
-          const SizedBox(height: 16),
-          ArticleCard(context: context, title: 'Exercises for Better Posture', author: 'Jane Smith', date: 'April 25, 2024', imageUrl: 'https://via.placeholder.com/150'),
-          const SizedBox(height: 16),
-          ArticleCard(context: context, title: 'Understanding Nutrition Labels', author: 'David Johnson', date: 'April 20, 2024', imageUrl: 'https://via.placeholder.com/150'),
-        ],
+        children: articles.map((article) {
+          return Column(
+            children: [
+              ArticleCard(
+                title: article.title,
+                author: article.author,
+                date: article.date,
+                imageUrl: article.imageUrl,
+              ),
+              const SizedBox(height: 16),
+            ],
+          );
+        }).toList(),
       ),
     );
   }
 }
-

@@ -5,7 +5,7 @@ class ArticleDetailPage extends StatelessWidget {
   final String author;
   final String date;
   final String imageUrl;
-  final String content;
+  
 
   const ArticleDetailPage({
     Key? key,
@@ -13,7 +13,7 @@ class ArticleDetailPage extends StatelessWidget {
     required this.author,
     required this.date,
     required this.imageUrl,
-    required this.content,
+    
   }) : super(key: key);
 
   @override
@@ -46,10 +46,10 @@ class ArticleDetailPage extends StatelessWidget {
               style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 16),
-            Text(
-              content,
-              style: const TextStyle(fontSize: 16),
-            ),
+            // Text(
+            //   content,
+            //   style: const TextStyle(fontSize: 16),
+            // ),
           ],
         ),
       ),
