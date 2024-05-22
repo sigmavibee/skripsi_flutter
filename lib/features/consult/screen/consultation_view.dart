@@ -5,7 +5,13 @@ class ConsultationPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Konsultasi'),
+        title: const Text('Konsultasi'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context, 0);
+          },
+        )
       ),
       body: ListView.builder(
         itemCount: 5, // Jumlah card konsultasi
@@ -15,7 +21,7 @@ class ConsultationPage extends StatelessWidget {
             direction: DismissDirection.horizontal,
             background: Container(
               color: Colors.red,
-              child: Align(
+              child: const Align(
                 alignment: Alignment.centerLeft,
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 20.0),
@@ -28,34 +34,34 @@ class ConsultationPage extends StatelessWidget {
             },
             child: Card(
               elevation: 4,
-              margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
               child: ListTile(
-                leading: CircleAvatar(
+                leading: const CircleAvatar(
                   backgroundImage: AssetImage('assets/profile.jpg'),
                 ),
                 title: Text('Nama Konsultan $index'),
-                subtitle: Text('Role Konsultan'),
+                subtitle: const Text('Role Konsultan'),
                 trailing: InkWell(
                   // onTap: () {
                   //   _openWhatsApp('+123456789'); // Nomor handphone untuk WhatsApp
                   // },
                   child: Container(
-                    padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                     decoration: BoxDecoration(
                       color: Colors.green,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: Row(
+                    child: const Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.message, color: Colors.white),
                         SizedBox(width: 4),
                         Text(
                           'Hubungi',
-                          style: TextStyle(color: Colors.white),
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ],
                     ),

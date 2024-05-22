@@ -32,8 +32,8 @@ class DiscussionCard extends StatelessWidget {
                   backgroundImage: NetworkImage(profileImageUrl),
                   radius: 20,
                 ),
-                SizedBox(width: 8),
-                Column(
+                const SizedBox(width: 8),
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text( 'santi'
@@ -46,17 +46,17 @@ class DiscussionCard extends StatelessWidget {
                 ),
               ],
             ),
-            SizedBox(height: 16),
-            Text(discussionTitle, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            SizedBox(height: 8),
+            const SizedBox(height: 16),
+            Text(discussionTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            const SizedBox(height: 8),
             Text(discussionReply),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Row(
               children: [
                 ElevatedButton.icon(
                   onPressed: () {},
-                  icon: Icon(Icons.thumb_up, color: Colors.black54),
-                  label: Text('Like', style: TextStyle(color: Colors.black54)),
+                  icon: const Icon(Icons.thumb_up, color: Colors.black54),
+                  label: const Text('Like', style: TextStyle(color: Colors.black54)),
                   style: ElevatedButton.styleFrom(
                   
                     shape: RoundedRectangleBorder(
@@ -64,11 +64,11 @@ class DiscussionCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(width: 8),
+                const SizedBox(width: 8),
                 ElevatedButton.icon(
                   onPressed: () {},
-                  icon: Icon(Icons.comment, color: Colors.black54),
-                  label: Text('Comment', style: TextStyle(color: Colors.black54)),
+                  icon: const Icon(Icons.comment, color: Colors.black54),
+                  label: const Text('Comment', style: const TextStyle(color: Colors.black54)),
                   style: ElevatedButton.styleFrom(
                 
                     shape: RoundedRectangleBorder(

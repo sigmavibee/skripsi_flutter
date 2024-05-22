@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:stunting_project/components/app_text_styles.dart';
 import 'package:stunting_project/components/colors.dart';
+import 'package:stunting_project/features/home/widget/articlepopular_widget.dart';
 
 import '../../article/screen/article_view.dart';
 import '../../gizi/screen/gizi_view.dart';
-import '../widget/banner_widget.dart'; // Import GiziPage
+import '../widget/banner_widget.dart';
+import '../widget/profilecard_widget.dart'; // Import GiziPage
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key});
@@ -26,29 +28,54 @@ class _HomeFull extends State<HomeFull> {
   int _selectedIndex = 0;
   String _appBarTitle = 'Home';
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-      switch (index) {
-        case 0:
-          _appBarTitle = 'Home';
-          break;
-        case 1:
-          _appBarTitle = 'Article';
-          break;
-        
-      }
-    });
+  Future<void> _onItemTapped(int index) async {
+    if (index == 2 || index == 3 || index == 4) {
+      // Save the current index before navigating
+      int previousIndex = _selectedIndex;
 
-    // Menampilkan halaman yang sesuai dengan item yang dipilih
-    if (index == 2) {
-      Navigator.pushNamed(context, 'gizi');
+      // Navigate to the new page and wait for the result
+      final result = await Navigator.pushNamed(context, _getRouteName(index));
+
+      // Check if a result was returned and set the _selectedIndex accordingly
+      if (result != null && result is int) {
+        setState(() {
+          _selectedIndex = result;
+        });
+      } else {
+        // If no result is returned, go back to the previous index
+        setState(() {
+          _selectedIndex = previousIndex;
+        });
+      }
+    } else {
+      setState(() {
+        _selectedIndex = index;
+        _appBarTitle = _getAppBarTitle(index);
+      });
     }
-    if (index == 3) {
-      Navigator.pushNamed(context, 'discussion');
+  }
+
+  String _getAppBarTitle(int index) {
+    switch (index) {
+      case 0:
+        return 'Home';
+      case 1:
+        return 'Article';
+      default:
+        return 'Home';
     }
-    if (index == 4) {
-      Navigator.pushNamed(context, 'consultation');
+  }
+
+  String _getRouteName(int index) {
+    switch (index) {
+      case 2:
+        return 'gizi';
+      case 3:
+        return 'discussion';
+      case 4:
+        return 'consultation';
+      default:
+        return 'home';
     }
   }
 
@@ -56,43 +83,30 @@ class _HomeFull extends State<HomeFull> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_appBarTitle, style: AppTextStyle.heading4Bold), automaticallyImplyLeading: false,  actions: [
+        backgroundColor: successColor,
+        title: Text(_appBarTitle, style: AppTextStyle.heading4Bold),
+        automaticallyImplyLeading: false,
+        actions: [
           IconButton(
-            icon: Icon(Icons.exit_to_app), // Icon logout
-            onPressed: () {Navigator.pushNamed(context, 'login');
-              // Aksi logout
+            icon: const Icon(Icons.exit_to_app),
+            onPressed: () {
+              Navigator.pushNamed(context, 'login');
             },
           ),
         ],
       ),
-      body: _selectedIndex == 0 // Check if _selectedIndex is 0 (Home)
+      body: _selectedIndex == 0
           ? Column(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  child: const Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundImage: AssetImage('assets/avatar.jpg'),
-                        radius: 30,
-                      ),
-                      SizedBox(width: 16),
-                      Text(
-                        'Charles Leclerc',
-                        style: AppTextStyle.body2Bold,
-                      ),
-                    ],
-                  ),
-                ), BannerWidget(),
+                ProfileCard(),
+                BannerWidget(),
                 Expanded(
-                  child: Container(
-                    alignment: Alignment.center,
-                    child: const Text('Main Content'),
+                  child: ArticlePopularCard(context: context, title: 'The Importance of Healthy Eating', author: 'John Doe', date: 'May 1, 2024', imageUrl: 'https://via.placeholder.com/150'
                   ),
                 ),
               ],
             )
-          : ArticlePage(), // Show ArticlePage if _selectedIndex is not 0
+          : ArticlePage(),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF000000),
         currentIndex: _selectedIndex,
@@ -126,3 +140,4 @@ class _HomeFull extends State<HomeFull> {
     );
   }
 }
+

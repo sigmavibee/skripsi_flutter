@@ -3,8 +3,15 @@ import 'package:stunting_project/components/app_text_styles.dart';
 import 'package:stunting_project/components/input_widgets.dart';
 import 'package:stunting_project/features/auth/login/screen/login_view.dart';
 
-class RegisterPage extends StatelessWidget {
+class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
+
+  @override
+  _RegisterPageState createState() => _RegisterPageState();
+}
+
+class _RegisterPageState extends State<RegisterPage> {
+  bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
@@ -41,12 +48,25 @@ class RegisterPage extends StatelessWidget {
                             customInputDecoration('Masukkan alamat email anda'),
                       )),
                   InputLayout(
-                      'Password',
-                      TextFormField(
-                          onChanged: (String value) => (() {}),
-                          //validator: noEmptyValidator,
-                          decoration:
-                              customInputDecoration("Masukkan password"))),
+                    'Password',
+                    TextFormField(
+                      obscureText: !_isPasswordVisible,
+                      onChanged: (String value) => (() {}),
+                      //validator: noEmptyValidator,
+                      decoration: customInputDecoration('Masukkan password').copyWith(
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
+                        ),
+                      ),
+                    ),
+                  ),
                   Container(
                     margin: const EdgeInsets.only(top: 20),
                     width: double.infinity,

@@ -10,16 +10,16 @@ class _BannerWidgetState extends State<BannerWidget> {
   late PageController _pageController;
   int _currentPage = 0;
   final List<String> _bannerImages = [
-    'https://via.placeholder.com/600x200?text=Banner+1',
-    'https://via.placeholder.com/600x200?text=Banner+2',
-    'https://via.placeholder.com/600x200?text=Banner+3',
+    'https://via.placeholder.com/300x150?text=Banner+1',
+    'https://via.placeholder.com/300x150?text=Banner+2',
+    'https://via.placeholder.com/300x150?text=Banner+3',
   ];
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: 0);
-    Timer.periodic(Duration(seconds: 10), (Timer timer) {
+    Timer.periodic(const Duration(seconds: 10), (Timer timer) {
       if (_currentPage < _bannerImages.length - 1) {
         _currentPage++;
       } else {
@@ -28,7 +28,7 @@ class _BannerWidgetState extends State<BannerWidget> {
 
       _pageController.animateToPage(
         _currentPage,
-        duration: Duration(milliseconds: 500),
+        duration: const Duration(milliseconds: 500),
         curve: Curves.easeIn,
       );
     });
@@ -42,17 +42,21 @@ class _BannerWidgetState extends State<BannerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 200,
-      child: PageView.builder(
-        controller: _pageController,
-        itemCount: _bannerImages.length,
-        itemBuilder: (context, index) {
-          return Image.network(
-            _bannerImages[index],
-            fit: BoxFit.cover,
-          );
-        },
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      
+      child: Container(
+        height: 150,
+        child: PageView.builder(
+          controller: _pageController,
+          itemCount: _bannerImages.length,
+          itemBuilder: (context, index) {
+            return Image.network(
+              _bannerImages[index],
+              fit: BoxFit.cover,
+            );
+          },
+        ),
       ),
     );
   }

@@ -14,16 +14,16 @@ class _DiscussionPageState extends State<DiscussionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Discussion'),
+        title: const Text('Discussion'),
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Discussion Title',
                   border: OutlineInputBorder(),
                 ),
@@ -33,9 +33,9 @@ class _DiscussionPageState extends State<DiscussionPage> {
                   });
                 },
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               TextField(
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: 'Your Question/Comment',
                   border: OutlineInputBorder(),
                 ),
@@ -46,18 +46,18 @@ class _DiscussionPageState extends State<DiscussionPage> {
                   });
                 },
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () {
                   // Handle sending the discussion content
                   _sendDiscussionContent();
                 },
-                child: Text('Send'),
-              ),SizedBox(height: 15,),
-              DiscussionCard(profileImageUrl: 'assets/profile.jpg', username: 'username', postedTime: 'postedTime', discussionTitle: 'discussionTitle', discussionReply: 'discussionReply'),
-              DiscussionCard(profileImageUrl: 'assets/profile.jpg', username: 'username', postedTime: 'postedTime', discussionTitle: 'discussionTitle', discussionReply: 'discussionReply'),
-              DiscussionCard(profileImageUrl: 'assets/profile.jpg', username: 'username', postedTime: 'postedTime', discussionTitle: 'discussionTitle', discussionReply: 'discussionReply'),
-              DiscussionCard(profileImageUrl: 'assets/profile.jpg', username: 'username', postedTime: 'postedTime', discussionTitle: 'discussionTitle', discussionReply: 'discussionReply')
+                child: const Text('Send'),
+              ),const SizedBox(height: 15,),
+              const DiscussionCard(profileImageUrl: 'assets/profile.jpg', username: 'username', postedTime: 'postedTime', discussionTitle: 'discussionTitle', discussionReply: 'discussionReply'),
+              const DiscussionCard(profileImageUrl: 'assets/profile.jpg', username: 'username', postedTime: 'postedTime', discussionTitle: 'discussionTitle', discussionReply: 'discussionReply'),
+              const DiscussionCard(profileImageUrl: 'assets/profile.jpg', username: 'username', postedTime: 'postedTime', discussionTitle: 'discussionTitle', discussionReply: 'discussionReply'),
+              const DiscussionCard(profileImageUrl: 'assets/profile.jpg', username: 'username', postedTime: 'postedTime', discussionTitle: 'discussionTitle', discussionReply: 'discussionReply')
             ],
           ),
         ),
@@ -73,7 +73,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
     print('Discussion Content: $_discussionContent');
     // Show a snackbar or dialog to indicate success or failure
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
+      const SnackBar(
         content: Text('Discussion content sent!'),
       ),
     );

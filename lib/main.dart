@@ -31,10 +31,10 @@ class MyApp extends StatelessWidget {
         'splash': (context) => const SplashPage(),
         'login': (context) => const LoginPage(),
         'register': (context) => const RegisterPage(),
-        '/': (context) => HomePage(),
+        '/': (context) => const HomePage(),
         'article': (context) => ArticlePage(),
-        'gizi':(context) => GiziPage(),
-        'gizihistory':(context) => GiziHistoryPage(),
+        'gizi':(context) => const GiziPage(),
+        'gizihistory':(context) => const GiziHistoryPage(),
         'discussion': (context) => DiscussionPage(),
         'consultation': (context) => ConsultationPage(),
 

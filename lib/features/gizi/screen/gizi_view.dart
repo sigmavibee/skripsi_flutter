@@ -7,9 +7,16 @@ class GiziPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Status Gizi Balita'),actions: [
+        title: const Text('Status Gizi Balita'),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context, 0);
+          },
+        ),
+        actions: [
           IconButton(
-            icon: Icon(Icons.history), // Icon yang digunakan untuk history
+            icon: const Icon(Icons.history), // Icon yang digunakan untuk history
             onPressed: () {Navigator.pushNamed(context, 'gizihistory'); // Action ketika ikon history ditekan
               // Action ketika ikon history ditekan
             },
@@ -23,11 +30,11 @@ class GiziPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               TextFormField(
-                decoration: InputDecoration(labelText: 'Nama Balita'),
+                decoration: const InputDecoration(labelText: 'Nama Balita'),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Tanggal Lahir'),
+                decoration: const InputDecoration(labelText: 'Tanggal Lahir'),
                 keyboardType: TextInputType.datetime,
                 // Use a DatePicker to select date
                 onTap: () async {
@@ -42,11 +49,11 @@ class GiziPage extends StatelessWidget {
                   }
                 },
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Row(
                 children: [
-                  Text('Jenis Kelamin:'),
-                  SizedBox(width: 8),
+                  const Text('Jenis Kelamin:'),
+                  const SizedBox(width: 8),
                   Row(
                     children: [
                       Radio(
@@ -56,7 +63,7 @@ class GiziPage extends StatelessWidget {
                           // Handle radio button changes
                         },
                       ),
-                      Text('Laki-laki'),
+                      const Text('Laki-laki'),
                       Radio(
                         value: 'Perempuan',
                         groupValue: 'gender',
@@ -64,27 +71,27 @@ class GiziPage extends StatelessWidget {
                           // Handle radio button changes
                         },
                       ),
-                      Text('Perempuan'),
+                      const Text('Perempuan'),
                     ],
                   ),
                 ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Tinggi Badan (cm)'),
+                decoration: const InputDecoration(labelText: 'Tinggi Badan (cm)'),
                 keyboardType: TextInputType.number,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               TextFormField(
-                decoration: InputDecoration(labelText: 'Berat Badan (kg)'),
+                decoration: const InputDecoration(labelText: 'Berat Badan (kg)'),
                 keyboardType: TextInputType.number,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () {
                   // Handle submit button
                 },
-                child: Text('Simpan'),
+                child: const Text('Simpan'),
               ),
             ],
           ),
