@@ -10,9 +10,9 @@ class _BannerWidgetState extends State<BannerWidget> {
   late PageController _pageController;
   int _currentPage = 0;
   final List<String> _bannerImages = [
-    'https://via.placeholder.com/300x150?text=Banner+1',
-    'https://via.placeholder.com/300x150?text=Banner+2',
-    'https://via.placeholder.com/300x150?text=Banner+3',
+    'https://cdn.bulat.co.id/uploads/images/202302/_1497_683-Situs-Ditebengi-Iklan-Judi-Online--11-Situs-Masih-Aktif.png',
+    'https://assets.promediateknologi.id/crop/0x0:0x0/750x500/webp/photo/p1/33/2023/09/13/Judi-Online-2-2533622778.png',
+    'https://x.com/sigmavibee/header_photo',
   ];
 
   @override

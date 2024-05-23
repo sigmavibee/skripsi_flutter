@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stunting_project/features/home/screen/home_view.dart';
+import 'package:stunting_project/features/profile/screen/editprofile_view.dart';
 import 'package:stunting_project/features/splash/splash_page.dart';
 
 import 'features/article/screen/article_view.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         'gizihistory':(context) => const GiziHistoryPage(),
         'discussion': (context) => DiscussionPage(),
         'consultation': (context) => ConsultationPage(),
+        'profile':(context) => const ProfileEdit(),
 
       },
     );

@@ -25,6 +25,7 @@ class _LoginPageState extends State<LoginPage> {
                 padding: const EdgeInsets.all(32.0),
                 children: [
                   Text(
+                    
                     'Masuk',
                     textAlign: TextAlign.center,
                     style: AppTextStyle.heading4Bold
@@ -32,12 +33,13 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   const SizedBox(height: 24.0),
                   Text(
-                    'Masukan kredensial anda untuk masuk ke akun',
+                    'Masukkan kredensial anda untuk masuk ke akun',
                     style: AppTextStyle.body2Medium.copyWith(color: Colors.black),
                   ),
                   InputLayout(
                     'Email',
                     TextFormField(
+                      
                       onChanged: (String value) => (() {}),
                       //validator: noEmptyValidator,
                       decoration: customInputDecoration('Masukkan alamat email anda'),

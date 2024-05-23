@@ -25,52 +25,56 @@ class HomeFull extends StatefulWidget {
 
 class _HomeFull extends State<HomeFull> {
   int _selectedIndex = 0;
-  String _appBarTitle = 'Home';
+String _appBarTitle = 'Home';
+String _previousAppBarTitle = 'Home';
 
-  Future<void> _onItemTapped(int index) async {
-    if (index == 2 || index == 3 || index == 4) {
-      int previousIndex = _selectedIndex;
-      final result = await Navigator.pushNamed(context, _getRouteName(index));
-      if (result != null && result is int) {
-        setState(() {
-          _selectedIndex = result;
-        });
-      } else {
-        setState(() {
-          _selectedIndex = previousIndex;
-        });
-      }
+Future<void> _onItemTapped(int index) async {
+  if (index == 2 || index == 3 || index == 4) {
+    int previousIndex = _selectedIndex;
+    final result = await Navigator.pushNamed(context, _getRouteName(index));
+    if (result != null && result is int) {
+      setState(() {
+        _selectedIndex = result;
+        _appBarTitle = _getAppBarTitle(result);
+      });
     } else {
       setState(() {
-        _selectedIndex = index;
-        _appBarTitle = _getAppBarTitle(index);
+        _selectedIndex = previousIndex;
+        _appBarTitle = _previousAppBarTitle;
       });
     }
+  } else {
+    setState(() {
+      _selectedIndex = index;
+      _previousAppBarTitle = _appBarTitle;
+      _appBarTitle = _getAppBarTitle(index);
+    });
   }
+}
 
-  String _getAppBarTitle(int index) {
-    switch (index) {
-      case 0:
-        return 'Home';
-      case 1:
-        return 'Article';
-      default:
-        return 'Home';
-    }
+String _getAppBarTitle(int index) {
+  switch (index) {
+    case 0:
+      return 'Home';
+    case 1:
+      return 'Article';
+    default:
+      return 'Home';
   }
+}
 
-  String _getRouteName(int index) {
-    switch (index) {
-      case 2:
-        return 'gizi';
-      case 3:
-        return 'discussion';
-      case 4:
-        return 'consultation';
-      default:
-        return 'home';
-    }
+String _getRouteName(int index) {
+  switch (index) {
+    case 2:
+      return 'gizi';
+    case 3:
+      return 'discussion';
+    case 4:
+      return 'consultation';
+    default:
+      return 'home';
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +95,11 @@ class _HomeFull extends State<HomeFull> {
       body: _selectedIndex == 0
           ? Column(
               children: [
-                ProfileCard(),
+                ProfileCard(
+                  onTap: () {
+                    Navigator.pushNamed(context, 'profile');
+                  },
+                ),
                 BannerWidget(),
                 Expanded(
                   child: ListView.builder(
