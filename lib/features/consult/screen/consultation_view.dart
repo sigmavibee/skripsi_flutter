@@ -1,6 +1,21 @@
 import 'package:flutter/material.dart';
 
-class ConsultationPage extends StatelessWidget {
+import 'package:stunting_project/data/consultation/consultation_models.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+class ConsultationPage extends StatefulWidget {
+  final List<Consultation> consultationData;
+
+  const ConsultationPage({
+    Key? key,
+    required this.consultationData,
+  }) : super(key: key);
+
+  @override
+  State<ConsultationPage> createState() => _ConsultationPageState();
+}
+
+class _ConsultationPageState extends State<ConsultationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,11 +26,12 @@ class ConsultationPage extends StatelessWidget {
           onPressed: () {
             Navigator.pop(context, 0);
           },
-        )
+        ),
       ),
       body: ListView.builder(
-        itemCount: 5, // Jumlah card konsultasi
+        itemCount: widget.consultationData.length, // Jumlah card konsultasi
         itemBuilder: (BuildContext context, int index) {
+          final consultation = widget.consultationData[index];
           return Dismissible(
             key: Key(index.toString()), // Key unik untuk setiap card
             direction: DismissDirection.horizontal,
@@ -30,7 +46,9 @@ class ConsultationPage extends StatelessWidget {
               ),
             ),
             onDismissed: (direction) {
-              // Tangani aksi swipe
+              setState(() {
+                widget.consultationData.removeAt(index);
+              });
             },
             child: Card(
               elevation: 4,
@@ -39,15 +57,15 @@ class ConsultationPage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: ListTile(
-                leading: const CircleAvatar(
-                  backgroundImage: AssetImage('assets/profile.jpg'),
+                leading: CircleAvatar(
+                  backgroundImage: AssetImage(consultation.imageUrl),
                 ),
-                title: Text('Nama Konsultan $index'),
+                title: Text(consultation.consultantName),
                 subtitle: const Text('Role Konsultan'),
                 trailing: InkWell(
-                  // onTap: () {
-                  //   _openWhatsApp('+123456789'); // Nomor handphone untuk WhatsApp
-                  // },
+                  onTap: () {
+                    _openWhatsApp(consultation.phoneNumber); // Nomor handphone untuk WhatsApp
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                     decoration: BoxDecoration(
@@ -61,7 +79,7 @@ class ConsultationPage extends StatelessWidget {
                         SizedBox(width: 4),
                         Text(
                           'Hubungi',
-                          style: const TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.white),
                         ),
                       ],
                     ),
@@ -75,12 +93,15 @@ class ConsultationPage extends StatelessWidget {
     );
   }
 
-//   void _openWhatsApp(String phoneNumber) async {
-//     // Membuka aplikasi WhatsApp dengan nomor handphone tertentu
-//     var whatsappUrl = "whatsapp://send?phone=$phoneNumber";
-//     await canLaunch(whatsappUrl)
-//         ? launch(whatsappUrl)
-//         : ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-//             content: Text('WhatsApp tidak terpasang di perangkat ini.')));
-//   }
-}
+ Future<void> _openWhatsApp(String phoneNumber) async {
+  var whatsappUrl = "https://wa.me/$phoneNumber";
+
+  // Check if the URL can be launched
+  if (await canLaunch(whatsappUrl)) {
+    // Launch the URL
+    await launch(whatsappUrl);
+  } else {
+    // Let the user know if the URL cannot be launched
+    print("Could not launch $whatsappUrl");
+  }
+}}

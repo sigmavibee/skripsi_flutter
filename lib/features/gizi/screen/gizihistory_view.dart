@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stunting_project/data/gizi/listgizi_models.dart';
+import 'package:stunting_project/data/gizi/gizi_list.dart';
 
 class GiziHistoryPage extends StatelessWidget {
   const GiziHistoryPage({Key? key}) : super(key: key);
@@ -10,7 +10,7 @@ class GiziHistoryPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('Riwayat Status Gizi'),),
         body: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
+        // scrollDirection: Axis.horizontal,
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: DataTable(columnSpacing: 12,

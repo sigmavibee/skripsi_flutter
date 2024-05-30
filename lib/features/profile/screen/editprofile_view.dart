@@ -13,59 +13,59 @@ class _ProfileEditState extends State<ProfileEdit> {
   Widget build(BuildContext context) {
   return Scaffold(
     appBar: AppBar(
-      title: Text('Edit Profile'),
+      title: const Text('Edit Profile'),
     ),
     body: SingleChildScrollView(
-      padding: EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(20.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          CircleAvatar(
+          const CircleAvatar(
             backgroundImage: AssetImage('assets/avatar.jpg'),
             radius: 30,
           ),
-          SizedBox(height: 20),
-          TextField(
+          const SizedBox(height: 20),
+          const TextField(
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               labelText: 'Nama',
             ),
           ),
-          SizedBox(height: 20),
-          TextField(
+          const SizedBox(height: 20),
+          const TextField(
             decoration: InputDecoration(
               border: OutlineInputBorder(),
               labelText: 'Email',
             ),
           ),
-          SizedBox(height: 20),
-          TextField(
+          const SizedBox(height: 20),
+          const TextField(
             decoration: InputDecoration(
               
               border: OutlineInputBorder(),
               labelText: 'Alamat',
             ),
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           TextField(
             decoration: InputDecoration(
               suffixIcon: IconButton(
-                icon: Icon(Icons.visibility),
+                icon: const Icon(Icons.visibility),
                 onPressed: () {
                   // Handle visibility action
                 },
               ),
-              border: OutlineInputBorder(),
+              border: const OutlineInputBorder(),
               labelText: 'Password',
             ),
             obscureText: true,
           ),
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           ElevatedButton(
             onPressed: () {
               // Handle submit action
             },
-            child: Text('Submit'),
+            child: const Text('Submit'),
           ),
         ],
       ),

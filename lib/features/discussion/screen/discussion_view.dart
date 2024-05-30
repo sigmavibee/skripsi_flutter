@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+
+
+import 'package:stunting_project/data/discussion/discussion_list.dart';
 import 'package:stunting_project/features/discussion/widget/discussion_card.dart';
 
 class DiscussionPage extends StatefulWidget {
@@ -7,9 +11,6 @@ class DiscussionPage extends StatefulWidget {
 }
 
 class _DiscussionPageState extends State<DiscussionPage> {
-  String _discussionTitle = '';
-  String _discussionContent = '';
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +21,8 @@ class _DiscussionPageState extends State<DiscussionPage> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               TextField(
                 decoration: const InputDecoration(
@@ -29,7 +31,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
                 ),
                 onChanged: (value) {
                   setState(() {
-                    _discussionTitle = value;
+                    // Handle text field changes
                   });
                 },
               ),
@@ -42,45 +44,35 @@ class _DiscussionPageState extends State<DiscussionPage> {
                 maxLines: 5,
                 onChanged: (value) {
                   setState(() {
-                    _discussionContent = value;
+                    // Handle text field changes
                   });
                 },
               ),
               const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () {
-                  // Handle sending the discussion content
-                  _sendDiscussionContent();
+                  // Handle button press
                 },
                 child: const Text('Send'),
-              ),const SizedBox(height: 15,),
-              const DiscussionCard(profileImageUrl: 'assets/profile.jpg', username: 'username', postedTime: 'postedTime', discussionTitle: 'discussionTitle', discussionReply: 'discussionReply'),
-              const DiscussionCard(profileImageUrl: 'assets/profile.jpg', username: 'username', postedTime: 'postedTime', discussionTitle: 'discussionTitle', discussionReply: 'discussionReply'),
-              const DiscussionCard(profileImageUrl: 'assets/profile.jpg', username: 'username', postedTime: 'postedTime', discussionTitle: 'discussionTitle', discussionReply: 'discussionReply'),
-              const DiscussionCard(profileImageUrl: 'assets/profile.jpg', username: 'username', postedTime: 'postedTime', discussionTitle: 'discussionTitle', discussionReply: 'discussionReply')
+              ),
+              const SizedBox(height: 15,),
+              const Text('Discussion List', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                        ListView.separated(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              primary: false,
+              itemCount: discussionData.length,
+              itemBuilder: (context, index) {
+                final discussion = discussionData[index];
+                return DiscussionCard(discussionData: discussion,);
+              },
+              separatorBuilder: (context, index) => Divider(),
+            )
             ],
           ),
         ),
       ),
     );
   }
-
-  
-
-  void _sendDiscussionContent() {
-    // Implement sending logic here (e.g., send API request, update database, etc.)
-    print('Discussion Title: $_discussionTitle');
-    print('Discussion Content: $_discussionContent');
-    // Show a snackbar or dialog to indicate success or failure
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Discussion content sent!'),
-      ),
-    );
-    // Clear the text fields after sending
-    setState(() {
-      _discussionTitle = '';
-      _discussionContent = '';
-    });
-  }
 }
+

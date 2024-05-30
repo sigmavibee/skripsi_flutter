@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class GiziPage extends StatelessWidget {
-  const GiziPage({Key? key}) : super(key: key);
+   GiziPage({Key? key}) : super(key: key);
 
   @override
+  final TextEditingController dateController = TextEditingController();
+  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -34,21 +38,22 @@ class GiziPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Tanggal Lahir'),
-                keyboardType: TextInputType.datetime,
-                // Use a DatePicker to select date
-                onTap: () async {
-                  DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime(2010),
-                    lastDate: DateTime(2030),
-                  );
-                  if (pickedDate != null) {
-                    // Handle selected date
-                  }
-                },
-              ),
+  controller: dateController,
+  decoration: const InputDecoration(labelText: 'Tanggal Lahir'),
+  keyboardType: TextInputType.datetime,
+  onTap: () async {
+    DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2010),
+      lastDate: DateTime(2030),
+    );
+    if (pickedDate != null) {
+      String formattedDate = formatter.format(pickedDate);
+      dateController.text = formattedDate;
+    }
+  },
+),
               const SizedBox(height: 16),
               Row(
                 children: [

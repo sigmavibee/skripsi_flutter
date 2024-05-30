@@ -12,16 +12,16 @@ class ProfileCard extends StatelessWidget {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),),
       child: InkWell(
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+        child: const Padding(
+          padding: EdgeInsets.all(16.0),
           child: Row(
             children: [
               CircleAvatar(
-                backgroundImage: AssetImage('assets/avatar.jpg'),
+                backgroundImage: AssetImage('https://thinksport.com.au/wp-content/uploads/2020/01/avatar-.jpg'),
                 radius: 30,
               ),
               SizedBox(width: 16),
-              Text(
+              const Text(
                 'Charles Leclerc',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),

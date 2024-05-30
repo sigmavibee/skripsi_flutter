@@ -1,25 +1,26 @@
 import 'package:flutter/material.dart';
 
-class DiscussionCard extends StatelessWidget {
-  final String profileImageUrl;
-  final String username;
-  final String postedTime;
-  final String discussionTitle;
-  final String discussionReply;
+import '../../../data/discussion/discussion_models.dart';
+
+class DiscussionCard extends StatefulWidget {
+  final Discussion discussionData;
 
   const DiscussionCard({
     Key? key,
-    required this.profileImageUrl,
-    required this.username,
-    required this.postedTime,
-    required this.discussionTitle,
-    required this.discussionReply,
+    required this.discussionData,
   }) : super(key: key);
+
+  @override
+  State<DiscussionCard> createState() => _DiscussionCardState();
+}
+
+class _DiscussionCardState extends State<DiscussionCard> {
+  bool _isLiked = false;
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -29,48 +30,49 @@ class DiscussionCard extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(profileImageUrl),
+                  backgroundImage: NetworkImage(widget.discussionData.profileImageUrl),
                   radius: 20,
                 ),
                 const SizedBox(width: 8),
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text( 'santi'
-                      // username, style: TextStyle(fontWeight: FontWeight.bold)
-                      ),
-                    Text('a week ago'
-                      // postedTime, style: TextStyle(color: Colors.grey, fontSize: 12)
-                      ),
+                    Text(widget.discussionData.username, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(widget.discussionData.postedTime, style: const TextStyle(color: Colors.grey, fontSize: 12)),
                   ],
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            Text(discussionTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text(widget.discussionData.discussionTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 8),
-            Text(discussionReply),
+            Text(widget.discussionData.discussionReply),
             const SizedBox(height: 16),
             Row(
               children: [
                 ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.thumb_up, color: Colors.black54),
-                  label: const Text('Like', style: TextStyle(color: Colors.black54)),
+                  onPressed: () {
+                    setState((){
+                      _isLiked = !_isLiked;
+                    });
+                  },
+                  icon:  Icon(Icons.thumb_up, color: _isLiked  ?Colors.green : Colors.black54,),
+                  label:  Text('Like', style: TextStyle(color: _isLiked ? Colors.green : Colors.black54)),
                   style: ElevatedButton.styleFrom(
-                  
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
+                    side: BorderSide(color: _isLiked ? Colors.green : Colors.transparent),
                   ),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton.icon(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.pushNamed(context, 'comment');
+                  },
                   icon: const Icon(Icons.comment, color: Colors.black54),
-                  label: const Text('Comment', style: const TextStyle(color: Colors.black54)),
+                  label: const Text('Comment', style: TextStyle(color: Colors.black54)),
                   style: ElevatedButton.styleFrom(
-                
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),

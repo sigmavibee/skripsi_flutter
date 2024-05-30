@@ -10,14 +10,14 @@ class ArticleCard extends StatelessWidget {
     required this.author,
     required this.date,
     required this.imageUrl,
-    //required this.content, // Tambahkan konten artikel
+    required this.content, // Tambahkan konten artikel
   });
 
   final String title;
   final String author;
   final String date;
   final String imageUrl;
-  //final String content; // Tambahkan konten artikel
+  final String content; // Tambahkan konten artikel
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class ArticleCard extends StatelessWidget {
                 author: author,
                 date: date,
                 imageUrl: imageUrl,
-                //content: content, // Tambahkan konten artikel
+                content: content, // Tambahkan konten artikel
               ),
             ),
           );

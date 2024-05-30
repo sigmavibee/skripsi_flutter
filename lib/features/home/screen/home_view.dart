@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:stunting_project/components/app_text_styles.dart';
 import 'package:stunting_project/components/colors.dart';
-import 'package:stunting_project/features/article/widget/articlecard_widget.dart';
+import 'package:stunting_project/features/home/widget/articlepopular_widget.dart';
 import 'package:stunting_project/features/home/widget/profilecard_widget.dart';
-import '../../../data/article/listarticle_models.dart';
 import '../widget/banner_widget.dart';
 import '../../article/screen/article_view.dart';
 
@@ -101,30 +100,24 @@ String _getRouteName(int index) {
                   },
                 ),
                 BannerWidget(),
+                Text('Artikel Populer', style: AppTextStyle.heading5Bold),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: articles.length,
-                    itemBuilder: (context, index) {
-                      final article = articles[index];
-                      return ArticleCard(
-                        title: article.title,
-                        author: article.author,
-                        date: article.date,
-                        imageUrl: article.imageUrl,
-                      );
-                    },
-                  ),
+                  child: ArticlePopular()
                 ),
               ],
             )
           : ArticlePage(),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF000000),
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         selectedItemColor: successColor,
         selectedFontSize: 14,
         unselectedItemColor: Colors.grey[800],
+        unselectedFontSize: 12,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.dashboard_outlined),
@@ -132,7 +125,7 @@ String _getRouteName(int index) {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.book_outlined),
-            label: 'Article',
+            label: 'Artikel',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.food_bank_outlined),
@@ -140,11 +133,11 @@ String _getRouteName(int index) {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat_outlined),
-            label: 'Discussion',
+            label: 'Diskusi',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.medical_services_outlined),
-            label: 'Consultation',
+            label: 'Konsultasi',
           ),
         ],
       ),

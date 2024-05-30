@@ -3,10 +3,12 @@ import 'package:stunting_project/features/home/screen/home_view.dart';
 import 'package:stunting_project/features/profile/screen/editprofile_view.dart';
 import 'package:stunting_project/features/splash/splash_page.dart';
 
+import 'data/consultation/consultation_list.dart';
 import 'features/article/screen/article_view.dart';
 import 'features/auth/login/screen/login_view.dart';
 import 'features/auth/register/screen/register_view.dart';
 import 'features/consult/screen/consultation_view.dart';
+import 'features/discussion/screen/comment_view.dart';
 import 'features/discussion/screen/discussion_view.dart';
 import 'features/gizi/screen/gizi_view.dart';
 import 'features/gizi/screen/gizihistory_view.dart';
@@ -34,11 +36,12 @@ class MyApp extends StatelessWidget {
         'register': (context) => const RegisterPage(),
         '/': (context) => const HomePage(),
         'article': (context) => ArticlePage(),
-        'gizi':(context) => const GiziPage(),
+        'gizi':(context) =>  GiziPage(),
         'gizihistory':(context) => const GiziHistoryPage(),
         'discussion': (context) => DiscussionPage(),
-        'consultation': (context) => ConsultationPage(),
+        'consultation': (context) => ConsultationPage(consultationData: consultationData),
         'profile':(context) => const ProfileEdit(),
+        'comment':(context) => const CommentPage(),
 
       },
     );

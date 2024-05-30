@@ -12,7 +12,7 @@ class _BannerWidgetState extends State<BannerWidget> {
   final List<String> _bannerImages = [
     'https://cdn.bulat.co.id/uploads/images/202302/_1497_683-Situs-Ditebengi-Iklan-Judi-Online--11-Situs-Masih-Aktif.png',
     'https://assets.promediateknologi.id/crop/0x0:0x0/750x500/webp/photo/p1/33/2023/09/13/Judi-Online-2-2533622778.png',
-    'https://x.com/sigmavibee/header_photo',
+    'https://cdn.bulat.co.id/uploads/images/202302/_1497_683-Situs-Ditebengi-Iklan-Judi-Online--11-Situs-Masih-Aktif.png',
   ];
 
   @override
@@ -44,9 +44,8 @@ class _BannerWidgetState extends State<BannerWidget> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      
       child: Container(
-        height: 150,
+                height: 150,
         child: PageView.builder(
           controller: _pageController,
           itemCount: _bannerImages.length,

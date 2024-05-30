@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../widget/articlecard_widget.dart';
-import '../../../data/article/listarticle_models.dart';
+import '../../../data/article/article_list.dart';
 
 class ArticlePage extends StatelessWidget {
   @override
@@ -17,6 +17,7 @@ class ArticlePage extends StatelessWidget {
                 author: article.author,
                 date: article.date,
                 imageUrl: article.imageUrl,
+                content: article.content,
               ),
               const SizedBox(height: 16),
             ],
