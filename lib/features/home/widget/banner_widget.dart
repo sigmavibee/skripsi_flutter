@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:stunting_project/features/home/widget/promotion_widget.dart';
 
 class BannerWidget extends StatefulWidget {
   @override
@@ -9,10 +10,26 @@ class BannerWidget extends StatefulWidget {
 class _BannerWidgetState extends State<BannerWidget> {
   late PageController _pageController;
   int _currentPage = 0;
-  final List<String> _bannerImages = [
-    'https://cdn.bulat.co.id/uploads/images/202302/_1497_683-Situs-Ditebengi-Iklan-Judi-Online--11-Situs-Masih-Aktif.png',
-    'https://assets.promediateknologi.id/crop/0x0:0x0/750x500/webp/photo/p1/33/2023/09/13/Judi-Online-2-2533622778.png',
-    'https://cdn.bulat.co.id/uploads/images/202302/_1497_683-Situs-Ditebengi-Iklan-Judi-Online--11-Situs-Masih-Aktif.png',
+  final List<Map<String, dynamic>> _bannerData = [
+    {
+      'icon': Icons.calculate_rounded,
+      'iconColor': Colors.pink,
+      'title': 'Pantau Tumbuh Kembang Anak',
+      'description': 'Fitur BMI Calculator di Stunting Center telah dilengkapi dengan riwayat perhitungan, sehingga memudahkan pemantauan pertumbuhan anak'
+    },
+    {
+      'icon': Icons.book_rounded,
+      'iconColor': Colors.blue,
+      'title': 'Informasi Stunting Terlengkap',
+      'description': 'Dapatkan informasi mengenai stunting, pencegahan serta penanganan stunting terlengkap disini'
+    },
+    {
+      'icon': Icons.chat_rounded,
+      'iconColor': Colors.green,
+      'title': 'Forum Diskusi Stunting',
+      'description': 'Forum diskusi merupakan tempat yang aman untuk memberikan kesempatan dan dukungan dalam upaya mengatasi masalah stunting'
+    },
+    // Add more promotional data here
   ];
 
   @override
@@ -20,7 +37,7 @@ class _BannerWidgetState extends State<BannerWidget> {
     super.initState();
     _pageController = PageController(initialPage: 0);
     Timer.periodic(const Duration(seconds: 10), (Timer timer) {
-      if (_currentPage < _bannerImages.length - 1) {
+      if (_currentPage < _bannerData.length - 1) {
         _currentPage++;
       } else {
         _currentPage = 0;
@@ -48,11 +65,13 @@ class _BannerWidgetState extends State<BannerWidget> {
                 height: 150,
         child: PageView.builder(
           controller: _pageController,
-          itemCount: _bannerImages.length,
+          itemCount: _bannerData.length,
           itemBuilder: (context, index) {
-            return Image.network(
-              _bannerImages[index],
-              fit: BoxFit.cover,
+            return PromotionBanner(
+              icon: _bannerData[index]['icon'],
+              iconColor: _bannerData[index]['iconColor'],
+              title: _bannerData[index]['title'],
+              description: _bannerData[index]['description'],
             );
           },
         ),
