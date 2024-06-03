@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stunting_project/components/app_text_styles.dart';
 
 import 'package:stunting_project/data/consultation/consultation_models.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -20,7 +21,7 @@ class _ConsultationPageState extends State<ConsultationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Konsultasi'),
+        title: Text('Konsultasi',style: AppTextStyle.heading4Bold),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {

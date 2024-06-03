@@ -17,7 +17,7 @@ class ProfileCard extends StatelessWidget {
           child: Row(
             children: [
               CircleAvatar(
-                backgroundImage: AssetImage('https://thinksport.com.au/wp-content/uploads/2020/01/avatar-.jpg'),
+                backgroundImage: NetworkImage('https://thinksport.com.au/wp-content/uploads/2020/01/avatar-.jpg'),
                 radius: 30,
               ),
               SizedBox(width: 16),

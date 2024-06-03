@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stunting_project/data/gizi/gizi_list.dart';
+import 'package:stunting_project/components/app_text_styles.dart';
 
 class GiziHistoryPage extends StatelessWidget {
   const GiziHistoryPage({Key? key}) : super(key: key);
@@ -8,7 +9,7 @@ class GiziHistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Riwayat Status Gizi'),),
+        title: Text('Riwayat Status Gizi',style: AppTextStyle.heading4Bold,),),
         body: SingleChildScrollView(
         // scrollDirection: Axis.horizontal,
         child: SingleChildScrollView(

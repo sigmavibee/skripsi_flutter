@@ -83,22 +83,41 @@ String _getRouteName(int index) {
         title: Text(_appBarTitle, style: AppTextStyle.heading4Bold),
         automaticallyImplyLeading: false,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.exit_to_app),
-            onPressed: () {
-              Navigator.pushNamed(context, 'login');
-            },
-          ),
+          Container( margin: const EdgeInsets.symmetric(horizontal: 16.0),
+                padding: const EdgeInsets.all(8.0),
+            child: Image.asset('assets/logo_puskesmas.png', width: 20, height: 25, fit: BoxFit.contain,),
+            decoration: const BoxDecoration(
+                    image: DecorationImage(
+                        image: AssetImage('assets/logo_puskesmas.png'),
+                        fit: BoxFit.cover)))
         ],
       ),
       body: _selectedIndex == 0
           ? Column(
               children: [
-                ProfileCard(
-                  onTap: () {
-                    Navigator.pushNamed(context, 'profile');
-                  },
-                ),
+                 Row(
+                  children: [
+                    Expanded(
+                      flex: 7, // Takes 7/8 of the space
+                      child: ProfileCard(
+                        onTap: () {
+                          Navigator.pushNamed(context, 'profile');
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      flex: 1, // Takes 1/8 of the space
+                      child: SizedBox(height: 100,
+                        child: Card(
+                          child: IconButton(
+                            icon: const Icon(Icons.exit_to_app),
+                            onPressed: () {
+                              Navigator.pushNamed(context, 'login');
+                            },
+                          ),
+                        ),
+                      ),
+                    ),],),
                 BannerWidget(),
                 Text('Artikel Populer', style: AppTextStyle.heading5Bold),
                 Expanded(

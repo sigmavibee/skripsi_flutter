@@ -5,6 +5,8 @@ import 'package:stunting_project/features/article/screen/articledetail_view.dart
 import 'dart:async';
 
 class ArticlePopular extends StatefulWidget {
+  const ArticlePopular({super.key});
+
   @override
   _ArticlePopularState createState() => _ArticlePopularState();
 }

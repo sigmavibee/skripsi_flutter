@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:stunting_project/components/app_text_styles.dart';
 import 'package:intl/intl.dart';
 
-class GiziPage extends StatelessWidget {
-   GiziPage({Key? key}) : super(key: key);
+class GiziPage extends StatefulWidget {
+  GiziPage({Key? key}) : super(key: key);
 
   @override
-  final TextEditingController dateController = TextEditingController();
-  final DateFormat formatter = DateFormat('yyyy-MM-dd');
+  State<GiziPage> createState() => _GiziPageState();
+}
 
+class _GiziPageState extends State<GiziPage> {
+  final TextEditingController dateController = TextEditingController();
+  final DateFormat formatter = DateFormat('dd/MM/yyyy');
+  final _formKey = GlobalKey<FormState>();
+  
+  String _gender = '';
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Status Gizi Balita'),
+        title: Text('Status Gizi Balita', style: AppTextStyle.heading4Bold),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -20,9 +29,9 @@ class GiziPage extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.history), // Icon yang digunakan untuk history
-            onPressed: () {Navigator.pushNamed(context, 'gizihistory'); // Action ketika ikon history ditekan
-              // Action ketika ikon history ditekan
+            icon: const Icon(Icons.history),
+            onPressed: () {
+              Navigator.pushNamed(context, 'gizihistory');
             },
           ),
         ],
@@ -30,75 +39,126 @@ class GiziPage extends StatelessWidget {
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Nama Balita'),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-  controller: dateController,
-  decoration: const InputDecoration(labelText: 'Tanggal Lahir'),
-  keyboardType: TextInputType.datetime,
-  onTap: () async {
-    DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2010),
-      lastDate: DateTime(2030),
-    );
-    if (pickedDate != null) {
-      String formattedDate = formatter.format(pickedDate);
-      dateController.text = formattedDate;
-    }
-  },
-),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  const Text('Jenis Kelamin:'),
-                  const SizedBox(width: 8),
-                  Row(
-                    children: [
-                      Radio(
-                        value: 'Laki-laki',
-                        groupValue: 'gender',
-                        onChanged: (value) {
-                          // Handle radio button changes
-                        },
-                      ),
-                      const Text('Laki-laki'),
-                      Radio(
-                        value: 'Perempuan',
-                        groupValue: 'gender',
-                        onChanged: (value) {
-                          // Handle radio button changes
-                        },
-                      ),
-                      const Text('Perempuan'),
-                    ],
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Nama Balita'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Nama Balita tidak boleh kosong';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: dateController,
+                  decoration: const InputDecoration(labelText: 'Tanggal Lahir'),
+                  keyboardType: TextInputType.datetime,
+                  onTap: () async {
+                    DateTime? pickedDate = await showDatePicker(
+                      context: context,
+                      initialDate: DateTime.now(),
+                      firstDate: DateTime(2010),
+                      lastDate: DateTime(2030),
+                    );
+                    if (pickedDate != null) {
+                      String formattedDate = formatter.format(pickedDate);
+                      setState(() {
+                        dateController.text = formattedDate;
+                      });
+                    }
+                  },
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Tanggal Lahir tidak boleh kosong';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    const Text('Jenis Kelamin:'),
+                    const SizedBox(width: 8),
+                    Row(
+                      children: [
+                        Radio<String>(
+                          value: 'Laki-laki',
+                          groupValue: _gender,
+                          onChanged: (value) {
+                            setState(() {
+                              _gender = value!;
+                            });
+                          },
+                          activeColor: Colors.black,
+                        ),
+                        const Text('Laki-laki'),
+                        Radio<String>(
+                          value: 'Perempuan',
+                          groupValue: _gender,
+                          onChanged: (value) {
+                            setState(() {
+                              _gender = value!;
+                            });
+                          },
+                          activeColor: Colors.black,
+                        ),
+                        const Text('Perempuan'),
+                      ],
+                    ),
+                  ],
+                ),
+                if (_gender.isEmpty) 
+                  const Padding(
+                    padding: EdgeInsets.only(left: 16),
+                    child: Text(
+                      'Jenis Kelamin tidak boleh kosong',
+                      style: TextStyle(color: Colors.red, fontSize: 12),
+                    ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Tinggi Badan (cm)'),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Berat Badan (kg)'),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  // Handle submit button
-                },
-                child: const Text('Simpan'),
-              ),
-            ],
+                const SizedBox(height: 16),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Tinggi Badan (cm)'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Tinggi Badan tidak boleh kosong';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'Berat Badan (kg)'),
+                  keyboardType: TextInputType.number,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Berat Badan tidak boleh kosong';
+                    }
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate() && _gender.isNotEmpty) {
+                      // Handle submit button
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Data berhasil disimpan')),
+                      );
+                    } else if (_gender.isEmpty) {
+                      setState(() {});  // Trigger rebuild to show gender error
+                    }
+                  },
+                  child: const Text('Simpan'),
+              
+                ),SizedBox(height: 16,),Text('Kategori BMI :', style: AppTextStyle.body2Medium),
+              ],
+            ),
           ),
         ),
       ),

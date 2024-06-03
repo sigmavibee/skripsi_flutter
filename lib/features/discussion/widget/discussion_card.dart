@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../data/discussion/discussion_models.dart';
+import '../screen/comment_view.dart';
 
 class DiscussionCard extends StatefulWidget {
   final Discussion discussionData;
@@ -68,7 +69,12 @@ class _DiscussionCardState extends State<DiscussionCard> {
                 const SizedBox(width: 8),
                 ElevatedButton.icon(
                   onPressed: () {
-                    Navigator.pushNamed(context, 'comment');
+                     Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CommentPage(discussion: widget.discussionData),
+                      ),
+                    );
                   },
                   icon: const Icon(Icons.comment, color: Colors.black54),
                   label: const Text('Comment', style: TextStyle(color: Colors.black54)),

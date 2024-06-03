@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:stunting_project/components/app_text_styles.dart';
 
 
 import 'package:stunting_project/data/discussion/discussion_list.dart';
@@ -15,7 +16,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Discussion'),
+        title: const Text('Discussion',style: AppTextStyle.heading4Bold,),
       ),
       body: SingleChildScrollView(
         child: Padding(

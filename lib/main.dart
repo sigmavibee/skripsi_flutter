@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
         'discussion': (context) => DiscussionPage(),
         'consultation': (context) => ConsultationPage(consultationData: consultationData),
         'profile':(context) => const ProfileEdit(),
-        'comment':(context) => const CommentPage(),
+        // 'comment':(context) => const CommentPage(),
 
       },
     );
