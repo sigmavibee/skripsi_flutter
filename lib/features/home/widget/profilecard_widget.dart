@@ -2,28 +2,37 @@ import 'package:flutter/material.dart';
 
 class ProfileCard extends StatelessWidget {
   final VoidCallback onTap;
+  final String? username;
+  final String? avatarUrl;
 
-  const ProfileCard({Key? key, required this.onTap}) : super(key: key);
+  const ProfileCard({
+    Key? key,
+    required this.onTap,
+    this.username,
+    this.avatarUrl,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         onTap: onTap,
-        child: const Padding(
-          padding: EdgeInsets.all(16.0),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Row(
             children: [
               CircleAvatar(
-                backgroundImage: NetworkImage('https://thinksport.com.au/wp-content/uploads/2020/01/avatar-.jpg'),
+                backgroundImage: avatarUrl != null
+                    ? NetworkImage(avatarUrl!)
+                    : AssetImage('assets/avatar.jpg') as ImageProvider<Object>,
                 radius: 30,
               ),
-              SizedBox(width: 16),
-              const Text(
-                'Charles Leclerc',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              const SizedBox(width: 16),
+              Text(
+                username ?? 'Username',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ],
           ),
@@ -32,3 +41,4 @@ class ProfileCard extends StatelessWidget {
     );
   }
 }
+

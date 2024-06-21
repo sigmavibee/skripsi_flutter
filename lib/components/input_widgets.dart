@@ -19,7 +19,42 @@ class InputLayout extends StatelessWidget {
       children: [
         Text(
           label,
-          style: AppTextStyle.heading3Bold.copyWith(
+          style: AppTextStyle.body2Medium.copyWith(
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(
+          height: 5,
+        ),
+        Container(
+          child: inputField,
+        ),
+        const SizedBox(
+          height: 15,
+        ),
+      ],
+    );
+  }
+}
+
+class InputLayoutCus extends StatelessWidget {
+  String label;
+  StatefulWidget inputField;
+
+  InputLayoutCus(
+    this.label,
+    this.inputField, {
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: AppTextStyle.body3Regular.copyWith(
             color: Colors.black,
           ),
         ),

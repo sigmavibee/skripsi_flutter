@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stunting_project/components/app_text_styles.dart';
 import 'package:stunting_project/components/colors.dart';
 import 'package:stunting_project/features/home/widget/articlepopular_widget.dart';
 import 'package:stunting_project/features/home/widget/profilecard_widget.dart';
 import '../widget/banner_widget.dart';
 import '../../article/screen/article_view.dart';
+import '../../../service/auth_service.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -24,56 +26,116 @@ class HomeFull extends StatefulWidget {
 
 class _HomeFull extends State<HomeFull> {
   int _selectedIndex = 0;
-String _appBarTitle = 'Home';
-String _previousAppBarTitle = 'Home';
+  String _appBarTitle = 'Home';
+  String _previousAppBarTitle = '';
+  String? _username;
+  String? _avatarUrl;
+  final AuthService _authService = AuthService();
+  String? accessToken;
 
-Future<void> _onItemTapped(int index) async {
-  if (index == 2 || index == 3 || index == 4) {
-    int previousIndex = _selectedIndex;
-    final result = await Navigator.pushNamed(context, _getRouteName(index));
-    if (result != null && result is int) {
-      setState(() {
-        _selectedIndex = result;
-        _appBarTitle = _getAppBarTitle(result);
-      });
+  @override
+  void initState() {
+    super.initState();
+    _fetchAccessToken();
+  }
+
+  Future<String?> _getRefreshToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('refreshToken');
+  }
+
+  Future<void> _fetchAccessToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken');
+    if (accessToken != null) {
+      final authService = AuthService();
+      final profileData = await authService.getUserInfo(accessToken);
+      if (profileData != null) {
+        setState(() {
+          _username = profileData['username'];
+          _avatarUrl = profileData['profile'];
+        });
+      }
+    }
+  }
+
+
+
+  Future<void> _logoutUser() async {
+    final refreshToken = await _getRefreshToken(); // Retrieve refresh token
+
+    if (refreshToken != null) {
+      
+      final logoutResult = await _authService.logout(refreshToken); // Use refresh token for logout
+      if (logoutResult['success']) {
+        await _clearTokens();
+        Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
+      } else {
+       
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(logoutResult['message'])),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('No refresh token found.')),
+      );
+    }
+  }
+
+  Future<void> _clearTokens() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('accessToken');
+    await prefs.remove('refreshToken');
+  }
+
+  Future<void> _onItemTapped(int index) async {
+    if (index == 2 || index == 3 || index == 4) {
+      int previousIndex = _selectedIndex;
+      final result = await Navigator.pushNamed(context, _getRouteName(index));
+      if (result != null && result is int) {
+        setState(() {
+          _selectedIndex = result;
+          _appBarTitle = _getAppBarTitle(result);
+        });
+      } else {
+        setState(() {
+          _selectedIndex = previousIndex;
+          _appBarTitle = _previousAppBarTitle;
+        });
+      }
     } else {
       setState(() {
-        _selectedIndex = previousIndex;
-        _appBarTitle = _previousAppBarTitle;
+        _selectedIndex = index;
+        _previousAppBarTitle = _appBarTitle;
+        _appBarTitle = _getAppBarTitle(index);
       });
     }
-  } else {
-    setState(() {
-      _selectedIndex = index;
-      _previousAppBarTitle = _appBarTitle;
-      _appBarTitle = _getAppBarTitle(index);
-    });
   }
-}
 
-String _getAppBarTitle(int index) {
-  switch (index) {
-    case 0:
-      return 'Home';
-    case 1:
-      return 'Article';
-    default:
-      return 'Home';
+  String _getAppBarTitle(int index) {
+    switch (index) {
+      case 0:
+        return 'Home';
+      case 1:
+        return 'Article';
+      default:
+        return 'Home';
+    }
   }
-}
 
-String _getRouteName(int index) {
-  switch (index) {
-    case 2:
-      return 'gizi';
-    case 3:
-      return 'discussion';
-    case 4:
-      return 'consultation';
-    default:
-      return 'home';
+  String _getRouteName(int index) {
+    switch (index) {
+      case 2:
+        return 'gizi';
+      case 3:
+        return 'discussion';
+      case 4:
+        return 'consultation';
+      default:
+        return 'home';
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -83,47 +145,60 @@ String _getRouteName(int index) {
         title: Text(_appBarTitle, style: AppTextStyle.heading4Bold),
         automaticallyImplyLeading: false,
         actions: [
-          Container( margin: const EdgeInsets.symmetric(horizontal: 16.0),
-                padding: const EdgeInsets.all(8.0),
-            child: Image.asset('assets/logo_puskesmas.png', width: 20, height: 25, fit: BoxFit.contain,),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.all(8.0),
+            child: Image.asset(
+              'assets/logo_puskesmas.png',
+              width: 20,
+              height: 25,
+              fit: BoxFit.contain,
+            ),
             decoration: const BoxDecoration(
-                    image: DecorationImage(
-                        image: AssetImage('assets/logo_puskesmas.png'),
-                        fit: BoxFit.cover)))
+              image: DecorationImage(
+                image: AssetImage('assets/logo_puskesmas.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          )
         ],
       ),
       body: _selectedIndex == 0
-          ? Column(
-              children: [
-                 Row(
-                  children: [
-                    Expanded(
-                      flex: 7, // Takes 7/8 of the space
-                      child: ProfileCard(
-                        onTap: () {
-                          Navigator.pushNamed(context, 'profile');
-                        },
+          ? SingleChildScrollView(
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 7, // Takes 7/8 of the space
+                        child: ProfileCard(username: _username,avatarUrl: _avatarUrl,
+                          onTap: () {
+                            Navigator.pushNamed(context, 'profile');
+                          },
+                        ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 1, // Takes 1/8 of the space
-                      child: SizedBox(height: 100,
-                        child: Card(
-                          child: IconButton(
-                            icon: const Icon(Icons.exit_to_app),
-                            onPressed: () {
-                              Navigator.pushNamed(context, 'login');
-                            },
+                      Expanded(
+                        flex: 1, // Takes 1/8 of the space
+                        child: SizedBox(
+                          height: 100,
+                          child: Card(
+                            child: IconButton(
+                              icon: const Icon(Icons.exit_to_app),
+                              onPressed: _logoutUser,
+                            ),
                           ),
                         ),
                       ),
-                    ),],),
-                BannerWidget(),
-                Text('Artikel Populer', style: AppTextStyle.heading5Bold),
-                Expanded(
-                  child: ArticlePopular()
-                ),
-              ],
+                    ],
+                  ),
+                  BannerWidget(),
+                  Text('Artikel Populer', style: AppTextStyle.heading5Bold),
+                  SizedBox(
+                    height: 268, // Set a height to avoid overflow error
+                    child: ArticlePopular(),
+                  ),
+                ],
+              ),
             )
           : ArticlePage(),
       bottomNavigationBar: BottomNavigationBar(

@@ -52,6 +52,15 @@ class _GiziPageState extends State<GiziPage> {
                     }
                     return null;
                   },
+                ),const SizedBox(height: 16),
+                TextFormField(
+                  decoration: const InputDecoration(labelText: 'NIK'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'NIK tidak boleh kosong';
+                    }
+                    return null;
+                  },
                 ),
                 const SizedBox(height: 16),
                 TextFormField(
@@ -156,7 +165,9 @@ class _GiziPageState extends State<GiziPage> {
                   },
                   child: const Text('Simpan'),
               
-                ),SizedBox(height: 16,),Text('Kategori BMI :', style: AppTextStyle.body2Medium),
+                ),SizedBox(height: 16,),
+                Text('Umur Balita :', style: AppTextStyle.body2Medium),
+                Text('Kategori BMI :', style: AppTextStyle.body2Medium),
               ],
             ),
           ),

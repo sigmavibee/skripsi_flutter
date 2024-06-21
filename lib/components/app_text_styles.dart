@@ -43,6 +43,7 @@ class AppTextStyle {
       fontSize: 16.0,
       fontWeight: FontWeight.normal,
       height: 24 / 16);
+
   static const TextStyle body3Medium = TextStyle(
       fontFamily: 'Montserrat',
       fontSize: 14.0,
@@ -58,6 +59,12 @@ class AppTextStyle {
       fontSize: 14.0,
       fontWeight: FontWeight.bold,
       height: 20 / 14);
+  static const TextStyle body3Regular = TextStyle(
+      fontFamily: 'Montserrat',
+      fontSize: 14.0,
+      fontWeight: FontWeight.normal,
+      height: 20 / 14);
+
   static const TextStyle body4SemiBold = TextStyle(
       fontFamily: 'Montserrat',
       fontSize: 12.0,

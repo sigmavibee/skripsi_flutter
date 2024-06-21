@@ -8,7 +8,7 @@ import 'features/article/screen/article_view.dart';
 import 'features/auth/login/screen/login_view.dart';
 import 'features/auth/register/screen/register_view.dart';
 import 'features/consult/screen/consultation_view.dart';
-import 'features/discussion/screen/comment_view.dart';
+
 import 'features/discussion/screen/discussion_view.dart';
 import 'features/gizi/screen/gizi_view.dart';
 import 'features/gizi/screen/gizihistory_view.dart';

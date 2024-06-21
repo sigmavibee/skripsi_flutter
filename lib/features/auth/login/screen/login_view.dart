@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stunting_project/components/app_text_styles.dart';
 import 'package:stunting_project/components/input_widgets.dart';
 import 'package:stunting_project/features/home/screen/home_view.dart';
+
+import '../../../../service/auth_service.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,87 +15,145 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _isPasswordVisible = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+
+  Future<void> _storeTokens(String accessToken, String refreshToken) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('accessToken', accessToken);
+    await prefs.setString('refreshToken', refreshToken);
+  }
+
+  Future<void> _login() async {
+    final String email = _emailController.text;
+    final String password = _passwordController.text;
+
+    final result = await _authService.login(email, password);
+
+    if (result['success']) {
+      // Store the tokens
+      await _storeTokens(result['accessToken'], result['refreshToken']);
+
+      // Navigate to the home page after successful login
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ),
+      );
+
+      print('Refresh Token: ${result['refreshToken']}');
+      print('Access Token: ${result['accessToken']}');
+    } else {
+      _showSnackBar(result['message']);
+    }
+  }
+
+Future<String?> _getAccessToken() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('accessToken');
+}
+
+Future<String?> _getRefreshToken() async {
+  final prefs = await SharedPreferences.getInstance();
+  return prefs.getString('refreshToken');
+}
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        body: Stack(
+    return Scaffold(
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        child: Stack(
           children: [
             SafeArea(
-              child: ListView(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.all(32.0),
-                children: [
-                  Text(
-                    
-                    'Masuk',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyle.heading4Bold
-                        .copyWith(color: const Color.fromARGB(255, 34, 14, 14)),
-                  ),
-                  const SizedBox(height: 24.0),
-                  Text(
-                    'Masukkan kredensial anda untuk masuk ke akun',
-                    style: AppTextStyle.body2Medium.copyWith(color: Colors.black),
-                  ),
-                  InputLayout(
-                    'Email',
-                    TextFormField(
-                      
-                      onChanged: (String value) => (() {}),
-                      //validator: noEmptyValidator,
-                      decoration: customInputDecoration('Masukkan alamat email anda'),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Masuk',
+                      textAlign: TextAlign.center,
+                      style: AppTextStyle.heading3Bold.copyWith(
+                        color: const Color.fromARGB(255, 34, 14, 14),
+                      ),
                     ),
-                  ),
-                  InputLayout(
-                    'Password',
-                    TextFormField(
-                      obscureText: !_isPasswordVisible,
-                      onChanged: (String value) => (() {}),
-                      //validator: noEmptyValidator,
-                      decoration: customInputDecoration('Masukkan password').copyWith(
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                    const SizedBox(height: 6.0),
+                    Text(
+                      'Masukkan kredensial anda untuk masuk ke akun',
+                      style: AppTextStyle.body2Medium.copyWith(color: Colors.black),
+                    ),
+                    InputLayout(
+                      'Email',
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: customInputDecoration('Masukkan alamat email anda'),
+                      ),
+                    ),
+                    InputLayout(
+                      'Password',
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: !_isPasswordVisible,
+                        decoration: customInputDecoration('Masukkan password').copyWith(
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                            ),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _isPasswordVisible = !_isPasswordVisible;
-                            });
-                          },
                         ),
                       ),
                     ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 20),
-                    width: double.infinity,
-                    child: FilledButton(
-                      style: buttonStyle,
-                      child: Text(
-                        'Masuk',
-                        style: AppTextStyle.body2Medium.copyWith(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const HomePage(),
+                    Container(
+                      margin: const EdgeInsets.only(top: 10),
+                      width: double.infinity,
+                      child: FilledButton(
+                        style: buttonStyle,
+                        child: Text(
+                          'Masuk',
+                          style: AppTextStyle.body2Medium.copyWith(
+                            color: Colors.black,
+                            fontWeight: FontWeight.bold,
                           ),
-                        );
-                      },
+                        ),
+                        onPressed: _login, // Call the login function
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+}
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: LoginPage(),
     );
   }
 }

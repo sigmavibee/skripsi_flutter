@@ -12,12 +12,13 @@ dependencies:
   bloc: ^8.1.1
   bloc_concurrency: ^0.2.1
   dartz: ^0.10.1
-  dio: ^4.0.6
+  dio: ^5.1.2
   expandable: ^5.0.1
   expansion_widget: ^0.0.3
   file_picker: ^5.2.6
   flutter:
     sdk: flutter
+  shared_preferences: ^2.0.15
   flutter_bloc: ^8.1.1
   flutter_svg: ^2.0.2
   image_picker: ^1.0.4
