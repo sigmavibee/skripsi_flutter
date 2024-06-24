@@ -28,6 +28,7 @@ class _HomeFull extends State<HomeFull> {
   int _selectedIndex = 0;
   String _appBarTitle = 'Home';
   String _previousAppBarTitle = '';
+  bool _isLoading = false;
   String? _username;
   String? _avatarUrl;
   final AuthService _authService = AuthService();
@@ -43,42 +44,56 @@ class _HomeFull extends State<HomeFull> {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('refreshToken');
   }
+  Future<String?> _getAccessToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('accessToken');
+  }
 
   Future<void> _fetchAccessToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    final accessToken = prefs.getString('accessToken');
-    if (accessToken != null) {
-      final authService = AuthService();
-      final profileData = await authService.getUserInfo(accessToken);
-      if (profileData != null) {
-        setState(() {
-          _username = profileData['username'];
-          _avatarUrl = profileData['profile'];
-        });
-      }
+    setState(() {
+    _isLoading = true;
+  });
+
+  final prefs = await SharedPreferences.getInstance();
+  final accessToken = prefs.getString('accessToken');
+  if (accessToken != null) {
+    _fetchUserInfo(accessToken);
+    
+  }
+
+  setState(() {
+    _isLoading = false;
+  });
+}
+
+  Future<void> _fetchUserInfo(String accessToken) async {
+    final profileData = await _authService.getUserInfo(accessToken);
+    print('Access Token: $accessToken');
+    if (profileData['success']) {
+      setState(() {
+        _username = profileData['data']['username'];
+        _avatarUrl = profileData['data']['profile'];
+      });
+    } else {
+      // Handle error
     }
   }
 
-
-
   Future<void> _logoutUser() async {
     final refreshToken = await _getRefreshToken(); // Retrieve refresh token
-
     if (refreshToken != null) {
-      
       final logoutResult = await _authService.logout(refreshToken); // Use refresh token for logout
       if (logoutResult['success']) {
         await _clearTokens();
         Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
       } else {
-       
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(logoutResult['message'])),
         );
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No refresh token found.')),
+        const SnackBar(content: Text('No refresh token found.')),
       );
     }
   }
@@ -163,78 +178,81 @@ class _HomeFull extends State<HomeFull> {
           )
         ],
       ),
-      body: _selectedIndex == 0
-          ? SingleChildScrollView(
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 7, // Takes 7/8 of the space
-                        child: ProfileCard(username: _username,avatarUrl: _avatarUrl,
-                          onTap: () {
-                            Navigator.pushNamed(context, 'profile');
-                          },
+      body: _isLoading
+        ? const Center(child: CircularProgressIndicator()) // Show loading indicator
+        : _selectedIndex == 0
+            ? SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 7, // Takes 7/8 of the space
+                          child: ProfileCard(
+                            username: _username,
+                            avatarUrl: _avatarUrl,
+                            onTap: () {
+                              Navigator.pushNamed(context, 'profile');
+                            },
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 1, // Takes 1/8 of the space
-                        child: SizedBox(
-                          height: 100,
-                          child: Card(
-                            child: IconButton(
-                              icon: const Icon(Icons.exit_to_app),
-                              onPressed: _logoutUser,
+                        Expanded(
+                          flex: 1, // Takes 1/8 of the space
+                          child: SizedBox(
+                            height: 100,
+                            child: Card(
+                              child: IconButton(
+                                icon: const Icon(Icons.exit_to_app),
+                                onPressed: _logoutUser,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  BannerWidget(),
-                  Text('Artikel Populer', style: AppTextStyle.heading5Bold),
-                  SizedBox(
-                    height: 268, // Set a height to avoid overflow error
-                    child: ArticlePopular(),
-                  ),
-                ],
-              ),
-            )
-          : ArticlePage(),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: successColor,
-        selectedFontSize: 14,
-        unselectedItemColor: Colors.grey[800],
-        unselectedFontSize: 12,
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book_outlined),
-            label: 'Artikel',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.food_bank_outlined),
-            label: 'Gizi',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_outlined),
-            label: 'Diskusi',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.medical_services_outlined),
-            label: 'Konsultasi',
-          ),
-        ],
-      ),
-    );
-  }
-}
+                      ],
+                    ),
+                    BannerWidget(),
+                    const Text('Artikel Populer', style: AppTextStyle.heading5Bold),
+                    const SizedBox(
+                      height: 268, // Set a height to avoid overflow error
+                      child: ArticlePopular(),
+                    ),
+                  ],
+                ),
+              )
+            : ArticlePage(),
+    bottomNavigationBar: BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      backgroundColor: Colors.white,
+      currentIndex: _selectedIndex,
+      onTap: _onItemTapped,
+      selectedItemColor: successColor,
+      selectedFontSize: 14,
+      unselectedItemColor: Colors.grey[800],
+      unselectedFontSize: 12,
+      showSelectedLabels: true,
+      showUnselectedLabels: true,
+      items: const <BottomNavigationBarItem>[
+        BottomNavigationBarItem(
+          icon: Icon(Icons.dashboard_outlined),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.book_outlined),
+          label: 'Artikel',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.food_bank_outlined),
+          label: 'Gizi',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.chat_outlined),
+          label: 'Diskusi',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.medical_services_outlined),
+          label: 'Konsultasi',
+        ),
+      ],
+    ),
+  );
+}}

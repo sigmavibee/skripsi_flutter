@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 
 class AuthService {
@@ -9,6 +11,7 @@ class AuthService {
   final String refreshTokenPath = '/api/auth/refresh'; // Add the refresh token endpoint
   final String userInfoPath = '/api/auth/me';
   final String logoutPath = '/api/auth/logout';
+  final String editProfilePath = '/api/auth/profile';
 
   String? _refreshToken;
   String? _accessToken;
@@ -201,6 +204,8 @@ class AuthService {
     }
   }
 
+  
+
   Future<Map<String, dynamic>> logout(String refreshToken) async {
   final String url = '$protocol://$host$logoutPath';
 
@@ -232,4 +237,52 @@ class AuthService {
   }
 }
 
+Future<Map<String, dynamic>> updateUserProfile(
+    String accessToken,
+    String username,
+    String email,
+    String? currentPassword,
+    String? newPassword,
+    File? profileImage
+  ) async {
+    final String url = '$protocol://$host$editProfilePath';
+
+    try {
+      FormData formData = FormData.fromMap({
+        'username': username,
+        'email': email,
+        'current_password': currentPassword,
+        'password': newPassword,
+        if (profileImage != null)
+          'profile': await MultipartFile.fromFile(profileImage.path, filename: 'profile.jpg'),
+      });
+
+      final response = await _dio.put(
+        url,
+        data: formData,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+            'Content-Type': 'multipart/form-data',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return {'success': true, 'message': 'User successfully updated'};
+      } else {
+        return {
+          'success': false,
+          'message': response.data['message'] ?? 'Failed to update profile'
+        };
+      }
+    } on DioException catch (e) {
+      return {
+        'success': false,
+        'message': 'An error occurred: ${e.response?.data['message'] ?? e.message}',
+      };
+    }
+  }
 }
+
+

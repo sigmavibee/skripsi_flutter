@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stunting_project/components/app_text_styles.dart';
 import 'package:stunting_project/components/input_widgets.dart';
-import 'package:stunting_project/features/home/screen/home_view.dart';
+
 
 import '../../../../service/auth_service.dart';
+import '../../../home/screen/home_view.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -36,10 +37,10 @@ class _LoginPageState extends State<LoginPage> {
       await _storeTokens(result['accessToken'], result['refreshToken']);
 
       // Navigate to the home page after successful login
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const HomePage(),
+          builder: (context) =>  HomePage(),
         ),
       );
 
@@ -49,16 +50,6 @@ class _LoginPageState extends State<LoginPage> {
       _showSnackBar(result['message']);
     }
   }
-
-Future<String?> _getAccessToken() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getString('accessToken');
-}
-
-Future<String?> _getRefreshToken() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getString('refreshToken');
-}
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -71,89 +62,71 @@ Future<String?> _getRefreshToken() async {
     return Scaffold(
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        child: Stack(
-          children: [
-            SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Masuk',
-                      textAlign: TextAlign.center,
-                      style: AppTextStyle.heading3Bold.copyWith(
-                        color: const Color.fromARGB(255, 34, 14, 14),
-                      ),
-                    ),
-                    const SizedBox(height: 6.0),
-                    Text(
-                      'Masukkan kredensial anda untuk masuk ke akun',
-                      style: AppTextStyle.body2Medium.copyWith(color: Colors.black),
-                    ),
-                    InputLayout(
-                      'Email',
-                      TextFormField(
-                        controller: _emailController,
-                        decoration: customInputDecoration('Masukkan alamat email anda'),
-                      ),
-                    ),
-                    InputLayout(
-                      'Password',
-                      TextFormField(
-                        controller: _passwordController,
-                        obscureText: !_isPasswordVisible,
-                        decoration: customInputDecoration('Masukkan password').copyWith(
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isPasswordVisible = !_isPasswordVisible;
-                              });
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: const EdgeInsets.only(top: 10),
-                      width: double.infinity,
-                      child: FilledButton(
-                        style: buttonStyle,
-                        child: Text(
-                          'Masuk',
-                          style: AppTextStyle.body2Medium.copyWith(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        onPressed: _login, // Call the login function
-                      ),
-                    ),
-                  ],
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'Masuk',
+                  textAlign: TextAlign.center,
+                  style: AppTextStyle.heading3Bold.copyWith(
+                    color: const Color.fromARGB(255, 34, 14, 14),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 6.0),
+                Text(
+                  'Masukkan kredensial anda untuk masuk ke akun',
+                  style: AppTextStyle.body2Medium.copyWith(color: Colors.black),
+                ),
+                InputLayout(
+                  'Email',
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: customInputDecoration('Masukkan alamat email anda'),
+                  ),
+                ),
+                InputLayout(
+                  'Password',
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: !_isPasswordVisible,
+                    decoration: customInputDecoration('Masukkan password').copyWith(
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isPasswordVisible = !_isPasswordVisible;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.only(top: 10),
+                  width: double.infinity,
+                  child: FilledButton(
+                    style: buttonStyle,
+                    child: Text(
+                      'Masuk',
+                      style: AppTextStyle.body2Medium.copyWith(
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onPressed: _login, // Call the login function
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 }
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: LoginPage(),
-    );
-  }
-}

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stunting_project/features/home/screen/home_view.dart';
+
 import 'package:stunting_project/features/profile/screen/editprofile_view.dart';
 import 'package:stunting_project/features/splash/splash_page.dart';
 
@@ -12,6 +12,7 @@ import 'features/consult/screen/consultation_view.dart';
 import 'features/discussion/screen/discussion_view.dart';
 import 'features/gizi/screen/gizi_view.dart';
 import 'features/gizi/screen/gizihistory_view.dart';
+import 'features/home/screen/home_view.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
         'splash': (context) => const SplashPage(),
         'login': (context) => const LoginPage(),
         'register': (context) => const RegisterPage(),
-        '/': (context) => const HomePage(),
+        '/': (context) => HomePage(),
         'article': (context) => ArticlePage(),
         'gizi':(context) =>  GiziPage(),
         'gizihistory':(context) => const GiziHistoryPage(),

@@ -24,14 +24,14 @@ class ProfileCard extends StatelessWidget {
           child: Row(
             children: [
               CircleAvatar(
-                backgroundImage: avatarUrl != null
+                backgroundImage: avatarUrl != null && avatarUrl!.isNotEmpty
                     ? NetworkImage(avatarUrl!)
                     : AssetImage('assets/avatar.jpg') as ImageProvider<Object>,
                 radius: 30,
               ),
               const SizedBox(width: 16),
               Text(
-                username ?? 'Username',
+                username ?? 'Name not fetched',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
             ],

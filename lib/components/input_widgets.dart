@@ -3,10 +3,10 @@ import 'package:stunting_project/components/app_text_styles.dart';
 
 
 class InputLayout extends StatelessWidget {
-  String label;
-  StatefulWidget inputField;
+  final String label;
+  final StatefulWidget inputField;
 
-  InputLayout(
+  const InputLayout(
     this.label,
     this.inputField, {
     super.key,
@@ -38,10 +38,10 @@ class InputLayout extends StatelessWidget {
 }
 
 class InputLayoutCus extends StatelessWidget {
-  String label;
-  StatefulWidget inputField;
+  final String label;
+  final StatefulWidget inputField;
 
-  InputLayoutCus(
+  const InputLayoutCus(
     this.label,
     this.inputField, {
     super.key,
