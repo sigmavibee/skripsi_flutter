@@ -9,7 +9,7 @@ import '../../article/screen/article_view.dart';
 import '../../../service/auth_service.dart';
 
 class HomePage extends StatelessWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class HomePage extends StatelessWidget {
 }
 
 class HomeFull extends StatefulWidget {
-  const HomeFull({Key? key}) : super(key: key);
+  const HomeFull({super.key});
 
   @override
   State<StatefulWidget> createState() => _HomeFull();
@@ -31,6 +31,7 @@ class _HomeFull extends State<HomeFull> {
   bool _isLoading = false;
   String? _username;
   String? _avatarUrl;
+
   final AuthService _authService = AuthService();
   String? accessToken;
 
@@ -50,20 +51,39 @@ class _HomeFull extends State<HomeFull> {
   }
 
   Future<void> _fetchAccessToken() async {
-    setState(() {
+  setState(() {
     _isLoading = true;
   });
 
   final prefs = await SharedPreferences.getInstance();
   final accessToken = prefs.getString('accessToken');
   if (accessToken != null) {
-    _fetchUserInfo(accessToken);
-    
+    final profileData = await _authService.getUserInfo(accessToken);
+    if (profileData['success']) {
+      setState(() {
+        _username = profileData['data']['username'];
+        _avatarUrl = profileData['data']['profile'];
+        _isLoading = false;
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Invalid or expired token. Please login again.'),
+        ),
+      );
+      Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
+    }
+  } else {
+    setState(() {
+      _isLoading = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Invalid or expired token. Please login again.'),
+      ),
+    );
+    Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
   }
-
-  setState(() {
-    _isLoading = false;
-  });
 }
 
   Future<void> _fetchUserInfo(String accessToken) async {
@@ -75,7 +95,9 @@ class _HomeFull extends State<HomeFull> {
         _avatarUrl = profileData['data']['profile'];
       });
     } else {
-      // Handle error
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(profileData['message'])),
+      );
     }
   }
 

@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:dio/dio.dart';
 
 class AuthService {
@@ -12,6 +11,7 @@ class AuthService {
   final String userInfoPath = '/api/auth/me';
   final String logoutPath = '/api/auth/logout';
   final String editProfilePath = '/api/auth/profile';
+  final String userByIdPath = '/api/user/:userId';
 
   String? _refreshToken;
   String? _accessToken;
@@ -204,46 +204,43 @@ class AuthService {
     }
   }
 
-  
-
   Future<Map<String, dynamic>> logout(String refreshToken) async {
-  final String url = '$protocol://$host$logoutPath';
+    final String url = '$protocol://$host$logoutPath';
 
-  try {
-    final response = await _dio.delete(
-      url,
-      data: {
-        'refreshToken': refreshToken,
-      },
-      )
-    ; // Debug print
+    try {
+      final response = await _dio.delete(
+        url,
+        data: {
+          'refreshToken': refreshToken,
+        },
+      );
 
-    if (response.statusCode == 200) {
-      return {
-        'success': true,
-        'message': 'User successfully logged out',
-      };
-    } else {
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'message': 'User successfully logged out',
+        };
+      } else {
+        return {
+          'success': false,
+          'message': response.data['message'] ?? 'Failed to log out user',
+        };
+      }
+    } on DioException catch (e) {
       return {
         'success': false,
-        'message': response.data['message'] ?? 'Failed to log out user',
+        'message': 'An error occurred: ${e.response?.data['message'] ?? e.message}',
       };
     }
-  } on DioException catch (e) {
-    return {
-      'success': false,
-      'message': 'An error occurred: ${e.response?.data['message'] ?? e.message}',
-    };
   }
-}
 
-Future<Map<String, dynamic>> updateUserProfile(
-    String accessToken,
-    String username,
-    String email,
-    String? currentPassword,
-    String? newPassword,
-    File? profileImage
+  Future<Map<String, dynamic>> updateUserProfile(
+      String accessToken,
+      String username,
+      String email,
+      String? currentPassword,
+      String? newPassword,
+      File? profileImage
   ) async {
     final String url = '$protocol://$host$editProfilePath';
 
@@ -283,6 +280,41 @@ Future<Map<String, dynamic>> updateUserProfile(
       };
     }
   }
+
+  Future<Map<String, dynamic>> getUserById(String userId, String accessToken) async {
+    final String url = '$protocol://$host$userByIdPath$userId';
+
+    try {
+      final response = await _dio.get(
+        url,
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return {
+          'success': true,
+          'data': response.data['data'],
+        };
+      } else {
+        return {
+          'success': false,
+          'message': response.data['message'] ?? 'Failed to fetch user',
+        };
+      }
+    } on DioException catch (e) {
+      String errorMessage = 'An error occurred';
+      if (e.response != null) {
+        errorMessage = e.response?.data['message'] ?? 'An error occurred';
+      }
+
+      return {
+        'success': false,
+        'message': 'Error ${e.response?.statusCode}: $errorMessage',
+      };
+    }
+  }
 }
-
-

@@ -9,12 +9,17 @@ class GiziHistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Riwayat Status Gizi',style: AppTextStyle.heading4Bold,),),
-        body: SingleChildScrollView(
+        title: Text(
+          'Riwayat Status Gizi',
+          style: AppTextStyle.heading4Bold,
+        ),
+      ),
+      body: SingleChildScrollView(
         // scrollDirection: Axis.horizontal,
         child: SingleChildScrollView(
           scrollDirection: Axis.vertical,
-          child: DataTable(columnSpacing: 12,
+          child: DataTable(
+            columnSpacing: 12,
             columns: const [
               DataColumn(label: Text('Nama')),
               DataColumn(label: Text('Umur')),
@@ -36,4 +41,6 @@ class GiziHistoryPage extends StatelessWidget {
           ),
         ),
       ),
-    );}}
+    );
+  }
+}

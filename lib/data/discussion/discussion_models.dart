@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'comment_models.dart';
 
 part 'discussion_models.g.dart';
 
@@ -41,39 +42,38 @@ class Discussion {
     this.comments,
   });
 
-  factory Discussion.fromJson(Map<String, dynamic> json) => _$DiscussionFromJson(json);
-  Map<String, dynamic> toJson() => _$DiscussionToJson(this);
-}
+  // Factory constructor to create a Discussion instance from JSON with error handling
+  factory Discussion.fromJson(Map<String, dynamic> json) {
+    try {
+      return Discussion(
+        id: json['id'] as String? ?? '',
+        title: json['title'] as String? ?? '',
+        postContent: json['post_content'] as String? ?? '',
+        posterId: json['poster_id'] as String? ?? '',
+        posterUsername: json['poster_username'] as String? ?? '',
+        posterProfile: json['poster_profile'] as String? ?? '',
+        posterRole: json['poster_role'] as String? ?? '',
+        commentCount: json['comment_count'] as int? ?? 0,
+        likeCount: json['like_count'] as int? ?? 0,
+        isLiked: json['is_liked'] as bool? ?? false,
+        createdAt: DateTime.parse(
+            json['created_at'] as String? ?? DateTime.now().toIso8601String()),
+        comments: (json['comments'] as List<dynamic>?)
+            ?.map((e) => Comment.fromJson(e as Map<String, dynamic>))
+            .toList(),
+      );
+    } catch (e) {
+      throw FormatException('Invalid Discussion JSON format: ${e.toString()}');
+    }
+  }
 
-@JsonSerializable()
-class Comment {
-  final String id;
-  @JsonKey(name: 'comment_content')
-  final String commentContent;
-  @JsonKey(name: 'commenter_id')
-  final String commenterId;
-  @JsonKey(name: 'commenter_username')
-  final String commenterUsername;
-  @JsonKey(name: 'commenter_profile')
-  final String commenterProfile;
-  @JsonKey(name: 'commenter_role')
-  final String commenterRole;
-  @JsonKey(name: 'discussion_id')
-  final String discussionId;
-  @JsonKey(name: 'created_at')
-  final DateTime createdAt;
-
-  Comment({
-    required this.id,
-    required this.commentContent,
-    required this.commenterId,
-    required this.commenterUsername,
-    required this.commenterProfile,
-    required this.commenterRole,
-    required this.discussionId,
-    required this.createdAt,
-  });
-
-  factory Comment.fromJson(Map<String, dynamic> json) => _$CommentFromJson(json);
-  Map<String, dynamic> toJson() => _$CommentToJson(this);
+  // Method to convert a Discussion instance to JSON with error handling
+  Map<String, dynamic> toJson() {
+    try {
+      return _$DiscussionToJson(this);
+    } catch (e) {
+      throw FormatException(
+          'Error converting Discussion to JSON: ${e.toString()}');
+    }
+  }
 }
