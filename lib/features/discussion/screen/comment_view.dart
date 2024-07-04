@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../components/app_text_styles.dart';
 import '../../../data/discussion/discussion_models.dart';
 
-
 class CommentPage extends StatefulWidget {
   final Discussion discussionData;
-  
 
   const CommentPage({Key? key, required this.discussionData}) : super(key: key);
 
@@ -28,7 +26,8 @@ class _CommentPageState extends State<CommentPage> {
             children: [
               Card(
                 margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
@@ -37,15 +36,18 @@ class _CommentPageState extends State<CommentPage> {
                       Row(
                         children: [
                           CircleAvatar(
-                            backgroundImage: NetworkImage(widget.discussionData.posterProfile),
+                            backgroundImage: NetworkImage(
+                                widget.discussionData.posterProfile),
                             radius: 20,
                           ),
                           const SizedBox(width: 10),
-                          Text(widget.discussionData.posterUsername, style: AppTextStyle.heading5Bold),
+                          Text(widget.discussionData.posterUsername,
+                              style: AppTextStyle.heading5Bold),
                         ],
                       ),
                       const SizedBox(height: 10),
-                      Text(widget.discussionData.title, style: AppTextStyle.heading5Bold),
+                      Text(widget.discussionData.title,
+                          style: AppTextStyle.heading5Bold),
                       const SizedBox(height: 10),
                       Text(widget.discussionData.postContent),
                     ],
@@ -53,39 +55,43 @@ class _CommentPageState extends State<CommentPage> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              Text('Comments', style: AppTextStyle.heading5Bold),
+              const Text('Comments', style: AppTextStyle.heading5Bold),
               ListView.separated(
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: widget.discussionData.commentCount,
                 itemBuilder: (context, index) {
-                   final comment = widget.discussionData.comments;
+                  final comment = widget.discussionData.comments;
                   return Card(
-                    margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                    margin:
+                        const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    child: const Padding(
+                      padding: EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Row(
                             children: [
                               CircleAvatar(
-                                backgroundImage: NetworkImage('assets/avatar.jpg'),
+                                backgroundImage:
+                                    NetworkImage('assets/avatar.jpg'),
                                 radius: 20,
                               ),
                               SizedBox(width: 10),
-                              Text('comment.name', style: AppTextStyle.heading5Bold),
+                              Text('comment.name',
+                                  style: AppTextStyle.heading5Bold),
                             ],
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           Text('comment.content'),
                         ],
                       ),
                     ),
                   );
                 },
-                separatorBuilder: (context, index) => Divider(),
+                separatorBuilder: (context, index) => const Divider(),
               ),
             ],
           ),

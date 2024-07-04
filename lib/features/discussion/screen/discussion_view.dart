@@ -16,6 +16,8 @@ class _DiscussionPageState extends State<DiscussionPage> {
   late Future<List<Discussion>> _futureDiscussions;
   final _formKey = GlobalKey<FormState>();
   String? _editingDiscussionId;
+  String? _currentUserId;
+  bool _isEditing = false;
 
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
@@ -23,7 +25,16 @@ class _DiscussionPageState extends State<DiscussionPage> {
   @override
   void initState() {
     super.initState();
-    _futureDiscussions = _loadDiscussions(); // Initialize with a default value
+    _loadCurrentUser();
+    _futureDiscussions = _loadDiscussions();
+  }
+
+  Future<void> _loadCurrentUser() async {
+    String? accessToken = await TokenManager.getAccessToken();
+    if (accessToken != null) {
+      _currentUserId = await TokenManager.getUserIdFromToken(accessToken);
+      print('Current User ID: $_currentUserId');
+    }
   }
 
   Future<List<Discussion>> _loadDiscussions() async {
@@ -34,11 +45,9 @@ class _DiscussionPageState extends State<DiscussionPage> {
       try {
         return await _discussionService.getDiscussions();
       } catch (e) {
-        print('Error loading discussions: $e'); // Logging error if any
         throw Exception('Error loading discussions: $e');
       }
     } else {
-      print('Invalid or expired token. Please login again.');
       throw Exception('Invalid or expired token. Please login again.');
     }
   }
@@ -62,8 +71,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
           // Print the data being sent to the server
           print('New Discussion Data: $requestData');
 
-          final createdDiscussion =
-              await _discussionService.createDiscussion(requestData);
+          await _discussionService.createDiscussion(requestData);
 
           setState(() {
             _futureDiscussions = _loadDiscussions();
@@ -138,17 +146,116 @@ class _DiscussionPageState extends State<DiscussionPage> {
           SnackBar(
               content: Text('Invalid or expired token. Please login again.')),
         );
-        Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
+        Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => true);
       }
     }
   }
 
+  void _deleteDiscussion(String discussionId) async {
+    String? accessToken = await TokenManager.getAccessToken();
+    if (accessToken != null) {
+      try {
+        await _discussionService.deleteDiscussion(discussionId);
+
+        setState(() {
+          _futureDiscussions = _loadDiscussions();
+        });
+
+        _titleController.clear();
+        _contentController.clear();
+        _editingDiscussionId = null;
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Discussion successfully deleted')),
+        );
+      } catch (e) {
+        print('Error deleting discussion: $e');
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting discussion: $e')),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Invalid or expired token. Please login again.'),
+        ),
+      );
+      Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => true);
+    }
+  }
+
   void _startEditingDiscussion(Discussion discussion) {
+    if (discussion.posterId == _currentUserId) {
+      setState(() {
+        _titleController.text = discussion.title;
+        _contentController.text = discussion.postContent;
+        _editingDiscussionId = discussion.id;
+        _isEditing = true; // Set to true when editing starts
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('You can only edit your own discussions.')),
+      );
+      print(
+          'Id : ${discussion.id} PosterId : ${discussion.posterId} CurrentUserId : $_currentUserId');
+    }
+  }
+
+  void _cancelEditing() {
     setState(() {
-      _titleController.text = discussion.title;
-      _contentController.text = discussion.postContent;
-      _editingDiscussionId = discussion.id;
+      _isEditing = false;
+      _editingDiscussionId = null;
+      _titleController.clear();
+      _contentController.clear();
     });
+  }
+
+  void _startDeletingDiscussion(Discussion discussion) {
+    if (discussion.posterId == _currentUserId) {
+      setState(() {
+        _titleController.text = discussion.title;
+        _contentController.text = discussion.postContent;
+        _editingDiscussionId = discussion.id;
+      });
+      _deleteDiscussion(discussion.id); // Pass discussion id to delete
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('You can only delete your own discussions.')),
+      );
+      print(
+          'Id : ${discussion.id} PosterId : ${discussion.posterId} CurrentUserId : $_currentUserId');
+    }
+  }
+
+  void _likeDiscussion(Discussion discussion) async {
+    try {
+      await _discussionService.likeDiscussion(discussion.id);
+      setState(() {
+        discussion.isLiked = true;
+        discussion.likeCount++;
+      });
+    } catch (e) {
+      print('Error liking discussion: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error liking discussion: $e')),
+      );
+    }
+  }
+
+  void _unlikeDiscussion(Discussion discussion) async {
+    try {
+      await _discussionService.unlikeDiscussion(discussion.id);
+      setState(() {
+        discussion.isLiked = false;
+        discussion.likeCount--;
+      });
+    } catch (e) {
+      print('Error unliking discussion: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error unliking discussion: $e')),
+      );
+    }
   }
 
   @override
@@ -160,80 +267,107 @@ class _DiscussionPageState extends State<DiscussionPage> {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                TextFormField(
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Judul tidak boleh kosong';
-                    }
-                    return null;
-                  },
-                  decoration: const InputDecoration(
-                    labelText: 'Judul Diskusi',
-                    border: OutlineInputBorder(),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Judul tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                    decoration: const InputDecoration(
+                      labelText: 'Judul Diskusi',
+                      border: OutlineInputBorder(),
+                    ),
+                    controller: _titleController,
                   ),
-                  controller: _titleController,
-                ),
-                const SizedBox(height: 16.0),
-                TextFormField(
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Isi Konten tidak boleh kosong';
-                    }
-                    return null;
-                  },
-                  decoration: const InputDecoration(
-                    labelText: 'Pertanyaan atau Komentar Anda',
-                    border: OutlineInputBorder(),
+                  const SizedBox(height: 16.0),
+                  TextFormField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Isi Konten tidak boleh kosong';
+                      }
+                      return null;
+                    },
+                    decoration: const InputDecoration(
+                      labelText: 'Pertanyaan atau Komentar Anda',
+                      border: OutlineInputBorder(),
+                    ),
+                    maxLines: 5,
+                    controller: _contentController,
                   ),
-                  maxLines: 5,
-                  controller: _contentController,
-                ),
-                const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: _createDiscussion,
-                  child: const Text('Send'),
-                ),
-                const SizedBox(height: 15),
-                const Text(
-                  'Discussion List',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                FutureBuilder<List<Discussion>>(
-                  future: _futureDiscussions,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const CircularProgressIndicator();
-                    } else if (snapshot.hasError) {
-                      return Text('Error: ${snapshot.error}');
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Text('No discussions found.');
-                    } else {
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        primary: false,
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          final discussion = snapshot.data![index];
-                          return DiscussionCard(discussionData: discussion);
-                        },
-                        separatorBuilder: (context, index) => Divider(),
-                      );
-                    }
-                  },
-                ),
-              ],
+                  const SizedBox(height: 8.0),
+                  if (_isEditing) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ElevatedButton(
+                          onPressed: _updateDiscussion,
+                          child: const Text('Update'),
+                        ),
+                        SizedBox(
+                          width: 10,
+                        ),
+                        ElevatedButton(
+                          onPressed: _cancelEditing,
+                          child: const Text('Cancel'),
+                        ),
+                      ],
+                    ),
+                  ] else
+                    ElevatedButton(
+                      onPressed: _createDiscussion,
+                      child: const Text('Send'),
+                    ),
+                  const SizedBox(height: 5),
+                  const Text(
+                    'Discussion List',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             ),
-          ),
+            Expanded(
+              child: FutureBuilder<List<Discussion>>(
+                future: _futureDiscussions,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text('No discussions found.');
+                  } else {
+                    return ListView.separated(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        final discussion = snapshot.data![index];
+                        return DiscussionCard(
+                          discussionData: discussion,
+                          onStartEditing: () =>
+                              _startEditingDiscussion(discussion),
+                          onStartDeleting: () =>
+                              _startDeletingDiscussion(discussion),
+                          onLike: () => _likeDiscussion(discussion),
+                          onUnlike: () => _unlikeDiscussion(discussion),
+                        );
+                      },
+                      separatorBuilder: (context, index) => Divider(),
+                    );
+                  }
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

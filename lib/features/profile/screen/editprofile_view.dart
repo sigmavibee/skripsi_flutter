@@ -7,7 +7,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../auth/login/screen/login_view.dart';
 
-
 class ProfileEdit extends StatefulWidget {
   const ProfileEdit({super.key});
 
@@ -71,26 +70,28 @@ class _ProfileEditState extends State<ProfileEdit> {
   Future<void> _updateUserProfile() async {
     if (_usernameController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Nama tidak boleh kosong')),
+        const SnackBar(content: Text('Nama tidak boleh kosong')),
       );
       return;
     }
 
     if (_emailController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Email tidak boleh kosong')),
+        const SnackBar(content: Text('Email tidak boleh kosong')),
       );
       return;
     }
 
-    if (_oldPasswordController.text.isNotEmpty && _newPasswordController.text.isEmpty) {
+    if (_oldPasswordController.text.isNotEmpty &&
+        _newPasswordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password baru tidak boleh kosong')),
+        const SnackBar(content: Text('Password baru tidak boleh kosong')),
       );
       return;
-    } else if (_oldPasswordController.text.isEmpty && _newPasswordController.text.isNotEmpty) {
+    } else if (_oldPasswordController.text.isEmpty &&
+        _newPasswordController.text.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Password lama tidak boleh kosong')),
+        const SnackBar(content: const Text('Password lama tidak boleh kosong')),
       );
       return;
     }
@@ -99,8 +100,12 @@ class _ProfileEditState extends State<ProfileEdit> {
       accessToken!, // Menggunakan accessToken yang benar
       _usernameController.text,
       _emailController.text,
-      _oldPasswordController.text.isNotEmpty ? _oldPasswordController.text : null,
-      _newPasswordController.text.isNotEmpty ? _newPasswordController.text : null,
+      _oldPasswordController.text.isNotEmpty
+          ? _oldPasswordController.text
+          : null,
+      _newPasswordController.text.isNotEmpty
+          ? _newPasswordController.text
+          : null,
       _profileImageFile, // Pastikan ini adalah file yang dipilih
     );
 
@@ -110,7 +115,8 @@ class _ProfileEditState extends State<ProfileEdit> {
 
     if (response['success']) {
       Navigator.of(context).pop(); // Close the profile edit page
-    } else if (response['status'] == 'Invalid or Expired token. Please login again.') {
+    } else if (response['status'] ==
+        'Invalid or Expired token. Please login again.') {
       // Navigate to the login page if token is invalid or expired
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
@@ -122,17 +128,23 @@ class _ProfileEditState extends State<ProfileEdit> {
 
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
-    final XFile? pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    final XFile? pickedFile =
+        await picker.pickImage(source: ImageSource.gallery);
 
     if (pickedFile != null) {
-      final String fileExtension = pickedFile.path.split('.').last.toLowerCase();
-      if (fileExtension == 'jpeg' || fileExtension == 'jpg' || fileExtension == 'png') {
+      final String fileExtension =
+          pickedFile.path.split('.').last.toLowerCase();
+      if (fileExtension == 'jpeg' ||
+          fileExtension == 'jpg' ||
+          fileExtension == 'png') {
         setState(() {
           _profileImageFile = File(pickedFile.path);
         });
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Hanya file JPEG, JPG, dan PNG yang diperbolehkan.')),
+          const SnackBar(
+              content:
+                  Text('Hanya file JPEG, JPG, dan PNG yang diperbolehkan.')),
         );
       }
     }
@@ -145,124 +157,137 @@ class _ProfileEditState extends State<ProfileEdit> {
         title: const Text('Edit Profile'),
       ),
       body: _isLoading
-        ? Center(child: CircularProgressIndicator())
-        : SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                InkWell(
-                  onTap: _pickImage,
-                  child: CircleAvatar(
-                    backgroundImage: _profileImageFile != null
-                        ? FileImage(_profileImageFile!)
-                        : _profileImageUrl != null
-                            ? NetworkImage(_profileImageUrl!)
-                            : AssetImage('assets/avatar.jpg') as ImageProvider,
-                    radius: 50,
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  InkWell(
+                    onTap: _pickImage,
+                    child: CircleAvatar(
+                      backgroundImage: _profileImageFile != null
+                          ? FileImage(_profileImageFile!)
+                          : _profileImageUrl != null
+                              ? NetworkImage(_profileImageUrl!)
+                              : const AssetImage('assets/avatar.jpg')
+                                  as ImageProvider,
+                      radius: 50,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  'Klik untuk mengubah foto',
-                  style: AppTextStyle.body3Regular,
-                ),
-                const SizedBox(height: 5),
-                InputLayoutCus(
-                  'Nama',
-                  TextFormField(
-                    controller: _usernameController,
-                    decoration: customInputDecoration("Masukkan nama anda"),
+                  const SizedBox(height: 5),
+                  const Text(
+                    'Klik untuk mengubah foto',
+                    style: AppTextStyle.body3Regular,
                   ),
-                ),
-                const SizedBox(height: 5),
-                InputLayoutCus(
-                  'Email',
-                  TextFormField(
-                    controller: _emailController,
-                    decoration: customInputDecoration("Masukkan email anda"),
+                  const SizedBox(height: 5),
+                  InputLayoutCus(
+                    'Nama',
+                    TextFormField(
+                      controller: _usernameController,
+                      decoration: customInputDecoration("Masukkan nama anda"),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 5),
-                InputLayoutCus(
-                  'Password Lama',
-                  TextFormField(
-                    controller: _oldPasswordController,
-                    obscureText: !_isPasswordVisible,
-                    decoration: customInputDecoration('Masukkan password').copyWith(
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  const SizedBox(height: 5),
+                  InputLayoutCus(
+                    'Email',
+                    TextFormField(
+                      controller: _emailController,
+                      decoration: customInputDecoration("Masukkan email anda"),
+                    ),
+                  ),
+                  const SizedBox(height: 5),
+                  InputLayoutCus(
+                    'Password Lama',
+                    TextFormField(
+                      controller: _oldPasswordController,
+                      obscureText: !_isPasswordVisible,
+                      decoration:
+                          customInputDecoration('Masukkan password').copyWith(
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
                       ),
                     ),
                   ),
-                ),
-                InputLayoutCus(
-                  'Password Baru',
-                  TextFormField(
-                    controller: _newPasswordController,
-                    obscureText: !_isPasswordVisible,
-                    decoration: customInputDecoration('Masukkan password').copyWith(
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                  InputLayoutCus(
+                    'Password Baru',
+                    TextFormField(
+                      controller: _newPasswordController,
+                      obscureText: !_isPasswordVisible,
+                      decoration:
+                          customInputDecoration('Masukkan password').copyWith(
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              _isPasswordVisible = !_isPasswordVisible;
+                            });
+                          },
                         ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all<Color>(Colors.red),
-                          foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
-                          textStyle: WidgetStateProperty.all<TextStyle>(
-                            AppTextStyle.body2Medium.copyWith(
-                              fontWeight: FontWeight.bold,
+                  const SizedBox(height: 5),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: ElevatedButton(
+                          onPressed: () {},
+                          style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.all<Color>(Colors.red),
+                            foregroundColor:
+                                WidgetStateProperty.all<Color>(Colors.black),
+                            textStyle: WidgetStateProperty.all<TextStyle>(
+                              AppTextStyle.body2Medium.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
+                          child: const Text('Logout'),
                         ),
-                        child: const Text('Logout'),
                       ),
-                    ),
-                    const SizedBox(width: 10), // Add this line (10 pixels spacing)
-                    Expanded(
-                      flex: 3,
-                      child: ElevatedButton(
-                        onPressed: _updateUserProfile,
-                        style: ButtonStyle(
-                          backgroundColor: WidgetStateProperty.all<Color>(Colors.red),
-                          foregroundColor: WidgetStateProperty.all<Color>(Colors.black),
-                          textStyle: WidgetStateProperty.all<TextStyle>(
-                            AppTextStyle.body2Medium.copyWith(
-                              fontWeight: FontWeight.bold,
+                      const SizedBox(
+                          width: 10), // Add this line (10 pixels spacing)
+                      Expanded(
+                        flex: 3,
+                        child: ElevatedButton(
+                          onPressed: _updateUserProfile,
+                          style: ButtonStyle(
+                            backgroundColor:
+                                WidgetStateProperty.all<Color>(Colors.red),
+                            foregroundColor:
+                                WidgetStateProperty.all<Color>(Colors.black),
+                            textStyle: WidgetStateProperty.all<TextStyle>(
+                              AppTextStyle.body2Medium.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
+                          child: const Text('Submit'),
                         ),
-                        child: const Text('Submit'),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-  );
-}}
+    );
+  }
+}

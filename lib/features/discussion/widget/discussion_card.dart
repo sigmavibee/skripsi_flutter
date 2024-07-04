@@ -6,10 +6,18 @@ import '../screen/comment_view.dart';
 
 class DiscussionCard extends StatefulWidget {
   final Discussion discussionData;
+  final VoidCallback onStartEditing;
+  final VoidCallback onStartDeleting;
+  final VoidCallback onLike;
+  final VoidCallback onUnlike;
 
   const DiscussionCard({
     Key? key,
     required this.discussionData,
+    required this.onStartEditing,
+    required this.onStartDeleting,
+    required this.onLike,
+    required this.onUnlike,
   }) : super(key: key);
 
   @override
@@ -17,14 +25,6 @@ class DiscussionCard extends StatefulWidget {
 }
 
 class _DiscussionCardState extends State<DiscussionCard> {
-  bool _isLiked = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _isLiked = widget.discussionData.isLiked;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -66,11 +66,7 @@ class _DiscussionCardState extends State<DiscussionCard> {
                           ),
                           child: Text(
                             widget.discussionData.posterRole,
-                            style: TextStyle(
-                              fontWeight: FontWeight.normal,
-                              color: _getRoleColor(
-                                  widget.discussionData.posterRole),
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.normal),
                           ),
                         ),
                         Text(
@@ -88,9 +84,10 @@ class _DiscussionCardState extends State<DiscussionCard> {
                 PopupMenuButton<String>(
                   onSelected: (value) {
                     if (value == 'update') {
-                      // _handleUpdate();
+                      widget
+                          .onStartEditing(); // Call _startEditingDiscussion callback
                     } else if (value == 'delete') {
-                      // _handleDelete();
+                      widget.onStartDeleting();
                     }
                   },
                   itemBuilder: (BuildContext context) =>
@@ -123,22 +120,34 @@ class _DiscussionCardState extends State<DiscussionCard> {
             Row(
               children: [
                 ElevatedButton.icon(
-                  onPressed: () {
-                    setState(() {
-                      _isLiked = !_isLiked;
-                    });
-                  },
-                  icon: Icon(Icons.thumb_up,
-                      color: _isLiked ? Colors.green : Colors.black54),
-                  label: Text(widget.discussionData.likeCount.toString(),
-                      style: TextStyle(
-                          color: _isLiked ? Colors.green : Colors.black54)),
+                  onPressed: widget.discussionData.isLiked
+                      ? widget.onUnlike
+                      : widget.onLike,
+                  icon: Icon(
+                    widget.discussionData.isLiked
+                        ? Icons.thumb_up
+                        : Icons.thumb_up_off_alt,
+                    color: widget.discussionData.isLiked
+                        ? Colors.blue
+                        : Colors.grey,
+                  ),
+                  label: Text(
+                    widget.discussionData.likeCount.toString(),
+                    style: TextStyle(
+                      color: widget.discussionData.isLiked
+                          ? Colors.blue
+                          : Colors.grey,
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                     side: BorderSide(
-                        color: _isLiked ? Colors.green : Colors.transparent),
+                      color: widget.discussionData.isLiked
+                          ? Colors.blue
+                          : Colors.transparent,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -173,11 +182,11 @@ class _DiscussionCardState extends State<DiscussionCard> {
   Color _getRoleColor(String role) {
     switch (role) {
       case 'ADMIN':
-        return Colors.red.withOpacity(0.1);
+        return Colors.red.withOpacity(0.5);
       case 'DOCTOR':
-        return Colors.green.withOpacity(0.1);
+        return Colors.green.withOpacity(0.5);
       default:
-        return Colors.black.withOpacity(0.1);
+        return Colors.blue.withOpacity(0.5);
     }
   }
 }

@@ -20,13 +20,15 @@ class Discussion {
   @JsonKey(name: 'comment_count')
   final int commentCount;
   @JsonKey(name: 'like_count')
-  final int likeCount;
+  int likeCount;
   @JsonKey(name: 'is_liked')
-  final bool isLiked;
+  bool isLiked; // Initialize this field
+
   @JsonKey(name: 'created_at')
   final DateTime createdAt;
   final List<Comment>? comments;
 
+  // Constructor with default values
   Discussion({
     required this.id,
     required this.title,
@@ -37,12 +39,12 @@ class Discussion {
     required this.posterRole,
     required this.commentCount,
     required this.likeCount,
-    required this.isLiked,
+    this.isLiked = false, // Initialize isLiked with false
     required this.createdAt,
     this.comments,
   });
 
-  // Factory constructor to create a Discussion instance from JSON with error handling
+  // Factory method to deserialize from JSON
   factory Discussion.fromJson(Map<String, dynamic> json) {
     try {
       return Discussion(
@@ -55,7 +57,8 @@ class Discussion {
         posterRole: json['poster_role'] as String? ?? '',
         commentCount: json['comment_count'] as int? ?? 0,
         likeCount: json['like_count'] as int? ?? 0,
-        isLiked: json['is_liked'] as bool? ?? false,
+        isLiked:
+            json['is_liked'] as bool? ?? false, // Ensure isLiked is initialized
         createdAt: DateTime.parse(
             json['created_at'] as String? ?? DateTime.now().toIso8601String()),
         comments: (json['comments'] as List<dynamic>?)
@@ -67,7 +70,7 @@ class Discussion {
     }
   }
 
-  // Method to convert a Discussion instance to JSON with error handling
+  // Method to serialize to JSON
   Map<String, dynamic> toJson() {
     try {
       return _$DiscussionToJson(this);

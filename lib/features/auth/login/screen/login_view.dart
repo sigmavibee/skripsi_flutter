@@ -3,7 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stunting_project/components/app_text_styles.dart';
 import 'package:stunting_project/components/input_widgets.dart';
 
-
 import '../../../../service/auth_service.dart';
 import '../../../home/screen/home_view.dart';
 
@@ -40,7 +39,7 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) =>  HomePage(),
+          builder: (context) => HomePage(),
         ),
       );
 
@@ -84,7 +83,8 @@ class _LoginPageState extends State<LoginPage> {
                   'Email',
                   TextFormField(
                     controller: _emailController,
-                    decoration: customInputDecoration('Masukkan alamat email anda'),
+                    decoration:
+                        customInputDecoration('Masukkan alamat email anda'),
                   ),
                 ),
                 InputLayout(
@@ -92,10 +92,13 @@ class _LoginPageState extends State<LoginPage> {
                   TextFormField(
                     controller: _passwordController,
                     obscureText: !_isPasswordVisible,
-                    decoration: customInputDecoration('Masukkan password').copyWith(
+                    decoration:
+                        customInputDecoration('Masukkan password').copyWith(
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                          _isPasswordVisible
+                              ? Icons.visibility
+                              : Icons.visibility_off,
                         ),
                         onPressed: () {
                           setState(() {
@@ -129,4 +132,3 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-

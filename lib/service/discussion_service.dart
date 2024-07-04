@@ -10,7 +10,8 @@ class DiscussionService {
   final String getDiscussionByIdPath =
       '/api/forum/:discussionId'; // Append article ID dynamically
   final String getUserPath = '/api/user/:userId';
-  final String updateDiscussionPath = '/api/forum/:discussionId';
+  // final String updateDiscussionPath = '/api/forum/:discussionId';
+  final String getLikePath = '/api/forum/:discussionId/like';
 
   DiscussionService() {
     _dio.options.baseUrl = '$protocol://$host';
@@ -138,7 +139,7 @@ class DiscussionService {
       }
 
       final response = await _dio.put(
-        updateDiscussionPath.replaceFirst(':discussionId', discussionId),
+        getDiscussionByIdPath.replaceFirst(':discussionId', discussionId),
         data: discussionData,
         options: Options(headers: {
           'Authorization': 'Bearer $accessToken',
@@ -157,6 +158,92 @@ class DiscussionService {
         throw Exception(response.data['message']);
       } else {
         throw Exception('Failed to update discussion');
+      }
+    } on DioException catch (e) {
+      String errorMessage = 'An error occurred';
+      if (e.response != null) {
+        errorMessage = e.response!.data['message'];
+      }
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<void> deleteDiscussion(String discussionId) async {
+    try {
+      final accessToken = await TokenManager.getAccessToken();
+      if (accessToken == null) {
+        throw Exception('Access token not found');
+      }
+
+      final response = await _dio.delete(
+        getDiscussionByIdPath.replaceFirst(':discussionId', discussionId),
+        options: Options(headers: {
+          'Authorization': 'Bearer $accessToken',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("Discussion successfully deleted");
+      } else if (response.statusCode == 401) {
+        throw Exception(response.data['message']);
+      } else {
+        throw Exception('Failed to delete discussion');
+      }
+    } on DioException catch (e) {
+      String errorMessage = 'An error occurred';
+      if (e.response != null) {
+        errorMessage = e.response!.data['message'];
+      }
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<void> likeDiscussion(String discussionId) async {
+    try {
+      final accessToken = await TokenManager.getAccessToken();
+      if (accessToken == null) {
+        throw Exception('Access token not found');
+      }
+
+      final response = await _dio.post(
+        getLikePath.replaceFirst(':discussionId', discussionId),
+        options: Options(headers: {
+          'Authorization': 'Bearer $accessToken',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("Discussion successfully liked");
+      } else {
+        throw Exception(response.data['message']);
+      }
+    } on DioException catch (e) {
+      String errorMessage = 'An error occurred';
+      if (e.response != null) {
+        errorMessage = e.response!.data['message'];
+      }
+      throw Exception(errorMessage);
+    }
+  }
+
+  Future<void> unlikeDiscussion(String discussionId) async {
+    try {
+      final accessToken = await TokenManager.getAccessToken();
+      if (accessToken == null) {
+        throw Exception('Access token not found');
+      }
+
+      final response = await _dio.post(
+        getLikePath.replaceFirst(':discussionId', discussionId),
+        options: Options(headers: {
+          'Authorization': 'Bearer $accessToken',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print("Discussion successfully unliked");
+      } else {
+        throw Exception(response.data['message']);
       }
     } on DioException catch (e) {
       String errorMessage = 'An error occurred';
