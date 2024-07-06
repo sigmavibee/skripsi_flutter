@@ -10,8 +10,7 @@ environment:
 dependencies:
   jwt_decode: ^0.3.1
   flutter_html: ^3.0.0-beta.2
-  bloc: ^8.1.1
-  bloc_concurrency: ^0.2.1
+  timeago: ^3.0.2
   dartz: ^0.10.1
   dio: ^5.1.2
   expandable: ^5.0.1

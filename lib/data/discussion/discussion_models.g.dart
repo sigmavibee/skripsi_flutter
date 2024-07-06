@@ -16,7 +16,7 @@ Discussion _$DiscussionFromJson(Map<String, dynamic> json) => Discussion(
       posterRole: json['poster_role'] as String,
       commentCount: (json['comment_count'] as num).toInt(),
       likeCount: (json['like_count'] as num).toInt(),
-      isLiked: json['is_liked'] as bool,
+      isLiked: json['is_liked'] as bool? ?? false,
       createdAt: DateTime.parse(json['created_at'] as String),
       comments: (json['comments'] as List<dynamic>?)
           ?.map((e) => Comment.fromJson(e as Map<String, dynamic>))

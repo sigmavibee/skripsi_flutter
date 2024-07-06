@@ -7,10 +7,7 @@ class DiscussionService {
   final String protocol = 'https'; // or 'http'
   final String host = 'www.givxl33t.site'; // Replace with your API host
   final String getDiscussionPath = '/api/forum';
-  final String getDiscussionByIdPath =
-      '/api/forum/:discussionId'; // Append article ID dynamically
-  final String getUserPath = '/api/user/:userId';
-  // final String updateDiscussionPath = '/api/forum/:discussionId';
+  final String getDiscussionByIdPath = '/api/forum/:discussionId';
   final String getLikePath = '/api/forum/:discussionId/like';
 
   DiscussionService() {

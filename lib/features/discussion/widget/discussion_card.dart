@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stunting_project/components/app_text_styles.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../data/discussion/discussion_models.dart';
 import '../screen/comment_view.dart';
@@ -69,11 +70,7 @@ class _DiscussionCardState extends State<DiscussionCard> {
                             style: TextStyle(fontWeight: FontWeight.normal),
                           ),
                         ),
-                        Text(
-                            widget.discussionData.createdAt
-                                .toIso8601String()
-                                .split('T')
-                                .first,
+                        Text(timeago.format(widget.discussionData.createdAt),
                             style: const TextStyle(
                                 color: Colors.grey, fontSize: 12)),
                       ],

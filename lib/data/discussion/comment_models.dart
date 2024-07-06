@@ -5,19 +5,18 @@ part 'comment_models.g.dart';
 @JsonSerializable()
 class Comment {
   final String id;
-  @JsonKey(name: 'comment_content')
   final String commentContent;
-  @JsonKey(name: 'commenter_id')
   final String commenterId;
-  @JsonKey(name: 'commenter_username')
   final String commenterUsername;
-  @JsonKey(name: 'commenter_profile')
   final String commenterProfile;
-  @JsonKey(name: 'commenter_role')
   final String commenterRole;
-  @JsonKey(name: 'discussion_id')
   final String discussionId;
-  @JsonKey(name: 'created_at')
+  final String discussionTitle;
+  final String discussionPostContent;
+  final String discussionPosterId;
+  final String discussionPosterUsername;
+  final String discussionPosterProfile;
+  final String discussionPosterRole;
   final DateTime createdAt;
 
   Comment({
@@ -28,9 +27,31 @@ class Comment {
     required this.commenterProfile,
     required this.commenterRole,
     required this.discussionId,
+    required this.discussionTitle,
+    required this.discussionPostContent,
+    required this.discussionPosterId,
+    required this.discussionPosterUsername,
+    required this.discussionPosterProfile,
+    required this.discussionPosterRole,
     required this.createdAt,
   });
 
-  factory Comment.fromJson(Map<String, dynamic> json) => _$CommentFromJson(json);
-  Map<String, dynamic> toJson() => _$CommentToJson(this);
+  factory Comment.fromJson(Map<String, dynamic> json) {
+    return Comment(
+      id: json['id'] ?? '',
+      commentContent: json['comment_content'] ?? '',
+      commenterId: json['commenter_id'] ?? '',
+      commenterUsername: json['commenter_username'] ?? '',
+      commenterProfile: json['commenter_profile'] ?? '',
+      commenterRole: json['commenter_role'] ?? '',
+      discussionId: json['discussion_id'] ?? '',
+      discussionTitle: json['discussion_title'] ?? '',
+      discussionPostContent: json['discussion_post_content'] ?? '',
+      discussionPosterId: json['discussion_poster_id'] ?? '',
+      discussionPosterUsername: json['discussion_poster_username'] ?? '',
+      discussionPosterProfile: json['discussion_poster_profile'] ?? '',
+      discussionPosterRole: json['discussion_poster_role'] ?? '',
+      createdAt: DateTime.parse(json['created_at']),
+    );
+  }
 }
