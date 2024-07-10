@@ -22,11 +22,27 @@ class _DiscussionPageState extends State<DiscussionPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
 
+  final FocusNode _focusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
+    _focusNode.addListener(_onFocusChange);
     _loadCurrentUser();
-    _futureDiscussions = _loadDiscussions();
+    _loadDiscussions();
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
+    super.dispose();
+  }
+
+  void _onFocusChange() {
+    if (_focusNode.hasFocus) {
+      _loadDiscussions();
+    }
   }
 
   Future<void> _loadCurrentUser() async {
@@ -37,7 +53,13 @@ class _DiscussionPageState extends State<DiscussionPage> {
     }
   }
 
-  Future<List<Discussion>> _loadDiscussions() async {
+  Future<void> _loadDiscussions() async {
+    setState(() {
+      _futureDiscussions = _fetchDiscussions();
+    });
+  }
+
+  Future<List<Discussion>> _fetchDiscussions() async {
     String? accessToken = await TokenManager.getAccessToken();
     print('Access Token: $accessToken'); // Logging token retrieval
 
@@ -73,9 +95,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
 
           await _discussionService.createDiscussion(requestData);
 
-          setState(() {
-            _futureDiscussions = _loadDiscussions();
-          });
+          _loadDiscussions();
 
           _titleController.clear();
           _contentController.clear();
@@ -86,7 +106,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text('Error'),
-                content: Text('Failed to create discussion: ${e.toString()}'),
+                content: Text('Gagal membuat diskusi ${e.toString()}'),
                 actions: [
                   TextButton(
                     onPressed: () {
@@ -123,9 +143,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
           await _discussionService.updateDiscussion(
               _editingDiscussionId!, requestData);
 
-          setState(() {
-            _futureDiscussions = _loadDiscussions();
-          });
+          _loadDiscussions();
 
           _titleController.clear();
           _contentController.clear();
@@ -157,9 +175,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
       try {
         await _discussionService.deleteDiscussion(discussionId);
 
-        setState(() {
-          _futureDiscussions = _loadDiscussions();
-        });
+        _loadDiscussions();
 
         _titleController.clear();
         _contentController.clear();
@@ -223,8 +239,6 @@ class _DiscussionPageState extends State<DiscussionPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('You can only delete your own discussions.')),
       );
-      print(
-          'Id : ${discussion.id} PosterId : ${discussion.posterId} CurrentUserId : $_currentUserId');
     }
   }
 
@@ -260,114 +274,121 @@ class _DiscussionPageState extends State<DiscussionPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Discussion',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    return WillPopScope(
+      onWillPop: () async {
+        _loadDiscussions();
+        return true;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            'Discussion',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          ),
         ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Judul tidak boleh kosong';
-                      }
-                      return null;
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'Judul Diskusi',
-                      border: OutlineInputBorder(),
-                    ),
-                    controller: _titleController,
-                  ),
-                  const SizedBox(height: 16.0),
-                  TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Isi Konten tidak boleh kosong';
-                      }
-                      return null;
-                    },
-                    decoration: const InputDecoration(
-                      labelText: 'Pertanyaan atau Komentar Anda',
-                      border: OutlineInputBorder(),
-                    ),
-                    maxLines: 5,
-                    controller: _contentController,
-                  ),
-                  const SizedBox(height: 8.0),
-                  if (_isEditing) ...[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ElevatedButton(
-                          onPressed: _updateDiscussion,
-                          child: const Text('Update'),
-                        ),
-                        SizedBox(
-                          width: 10,
-                        ),
-                        ElevatedButton(
-                          onPressed: _cancelEditing,
-                          child: const Text('Cancel'),
-                        ),
-                      ],
-                    ),
-                  ] else
-                    ElevatedButton(
-                      onPressed: _createDiscussion,
-                      child: const Text('Send'),
-                    ),
-                  const SizedBox(height: 5),
-                  const Text(
-                    'Discussion List',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: FutureBuilder<List<Discussion>>(
-                future: _futureDiscussions,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const CircularProgressIndicator();
-                  } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return const Text('No discussions found.');
-                  } else {
-                    return ListView.separated(
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        final discussion = snapshot.data![index];
-                        return DiscussionCard(
-                          discussionData: discussion,
-                          onStartEditing: () =>
-                              _startEditingDiscussion(discussion),
-                          onStartDeleting: () =>
-                              _startDeletingDiscussion(discussion),
-                          onLike: () => _likeDiscussion(discussion),
-                          onUnlike: () => _unlikeDiscussion(discussion),
-                        );
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Judul tidak boleh kosong';
+                        }
+                        return null;
                       },
-                      separatorBuilder: (context, index) => Divider(),
-                    );
-                  }
-                },
+                      decoration: const InputDecoration(
+                        labelText: 'Judul Diskusi',
+                        border: OutlineInputBorder(),
+                      ),
+                      controller: _titleController,
+                    ),
+                    const SizedBox(height: 16.0),
+                    TextFormField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Isi Konten tidak boleh kosong';
+                        }
+                        return null;
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'Pertanyaan atau Komentar Anda',
+                        border: OutlineInputBorder(),
+                      ),
+                      maxLines: 5,
+                      controller: _contentController,
+                    ),
+                    const SizedBox(height: 8.0),
+                    if (_isEditing) ...[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          ElevatedButton(
+                            onPressed: _updateDiscussion,
+                            child: const Text('Update'),
+                          ),
+                          SizedBox(
+                            width: 10,
+                          ),
+                          ElevatedButton(
+                            onPressed: _cancelEditing,
+                            child: const Text('Cancel'),
+                          ),
+                        ],
+                      ),
+                    ] else
+                      ElevatedButton(
+                        onPressed: _createDiscussion,
+                        child: const Text('Send'),
+                      ),
+                    const SizedBox(height: 5),
+                    const Text(
+                      'Discussion List',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+              Expanded(
+                child: FutureBuilder<List<Discussion>>(
+                  future: _futureDiscussions,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CircularProgressIndicator();
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Text('No discussions found.');
+                    } else {
+                      return ListView.separated(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          final discussion = snapshot.data![index];
+                          return DiscussionCard(
+                            discussionData: discussion,
+                            onStartEditing: () =>
+                                _startEditingDiscussion(discussion),
+                            onStartDeleting: () =>
+                                _startDeletingDiscussion(discussion),
+                            onLike: () => _likeDiscussion(discussion),
+                            onUnlike: () => _unlikeDiscussion(discussion),
+                          );
+                        },
+                        separatorBuilder: (context, index) => Divider(),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
