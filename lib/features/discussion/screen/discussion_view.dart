@@ -123,6 +123,32 @@ class _DiscussionPageState extends State<DiscussionPage> {
     }
   }
 
+  void _startEditingDiscussion(Discussion discussion) {
+    if (discussion.posterId == _currentUserId) {
+      setState(() {
+        _titleController.text = discussion.title;
+        _contentController.text = discussion.postContent;
+        _editingDiscussionId = discussion.id;
+        _isEditing = true; // Set to true when editing starts
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('You can only edit your own discussions.')),
+      );
+      print(
+          'Id : ${discussion.id} PosterId : ${discussion.posterId} CurrentUserId : $_currentUserId');
+    }
+  }
+
+  void _cancelEditing() {
+    setState(() {
+      _isEditing = false;
+      _editingDiscussionId = null;
+      _titleController.clear();
+      _contentController.clear();
+    });
+  }
+
   void _updateDiscussion() async {
     if (_formKey.currentState!.validate() && _editingDiscussionId != null) {
       String? accessToken = await TokenManager.getAccessToken();
@@ -199,32 +225,6 @@ class _DiscussionPageState extends State<DiscussionPage> {
       );
       Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => true);
     }
-  }
-
-  void _startEditingDiscussion(Discussion discussion) {
-    if (discussion.posterId == _currentUserId) {
-      setState(() {
-        _titleController.text = discussion.title;
-        _contentController.text = discussion.postContent;
-        _editingDiscussionId = discussion.id;
-        _isEditing = true; // Set to true when editing starts
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('You can only edit your own discussions.')),
-      );
-      print(
-          'Id : ${discussion.id} PosterId : ${discussion.posterId} CurrentUserId : $_currentUserId');
-    }
-  }
-
-  void _cancelEditing() {
-    setState(() {
-      _isEditing = false;
-      _editingDiscussionId = null;
-      _titleController.clear();
-      _contentController.clear();
-    });
   }
 
   void _startDeletingDiscussion(Discussion discussion) {

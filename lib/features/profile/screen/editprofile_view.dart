@@ -62,9 +62,40 @@ class _ProfileEditState extends State<ProfileEdit> {
     });
   }
 
+  Future<String?> _getRefreshToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('refreshToken');
+  }
+
   Future<String?> _getAccessToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('accessToken');
+  }
+
+  Future<void> _clearTokens() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('accessToken');
+    await prefs.remove('refreshToken');
+  }
+
+  Future<void> _logoutUser() async {
+    final refreshToken = await _getRefreshToken(); // Retrieve refresh token
+    if (refreshToken != null) {
+      final logoutResult = await _authService
+          .logout(refreshToken); // Use refresh token for logout
+      if (logoutResult['success']) {
+        await _clearTokens();
+        Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(logoutResult['message'])),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No refresh token found.')),
+      );
+    }
   }
 
   Future<void> _updateUserProfile() async {
@@ -248,7 +279,9 @@ class _ProfileEditState extends State<ProfileEdit> {
                       Expanded(
                         flex: 3,
                         child: ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            _logoutUser();
+                          },
                           style: ButtonStyle(
                             backgroundColor:
                                 WidgetStateProperty.all<Color>(Colors.red),

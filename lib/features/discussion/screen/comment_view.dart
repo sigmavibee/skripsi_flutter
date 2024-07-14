@@ -85,8 +85,6 @@ class _CommentPageState extends State<CommentPage> {
         return; // Hentikan eksekusi jika komentar kosong
       }
 
-      final createRequest = CreateCommentRequest(commentContent: postComment);
-
       // Assuming _commentService is an instance of CommentService
       {
         bool success = await _commentService.createComment(

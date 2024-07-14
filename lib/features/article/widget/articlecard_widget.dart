@@ -7,7 +7,8 @@ class ArticleCard extends StatelessWidget {
   final String date;
   final String imageUrl;
   final String content;
-  final int maxCharacters; // Menambahkan properti untuk menentukan jumlah karakter maksimum
+  final int
+      maxCharacters; // Menambahkan properti untuk menentukan jumlah karakter maksimum
 
   const ArticleCard({
     Key? key,
@@ -21,7 +22,8 @@ class ArticleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String limitedContent = content.substring(0, maxCharacters); // Ambil karakter pertama hingga maksimum yang ditentukan
+    String limitedContent = content.substring(0,
+        maxCharacters); // Ambil karakter pertama hingga maksimum yang ditentukan
     return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,18 +36,21 @@ class ArticleCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 8),
-                Text('By $author', style: TextStyle(fontSize: 14)),
-                SizedBox(height: 8),
-                Text(date, style: TextStyle(fontSize: 12, color: Colors.grey)),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
+                Text('By $author', style: const TextStyle(fontSize: 14)),
+                const SizedBox(height: 8),
+                Text(date,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                const SizedBox(height: 8),
                 Html(
                   data: limitedContent,
                   style: {'p': Style(fontSize: FontSize(16))},
                 ),
-                if (content.length > maxCharacters) // Tampilkan tombol untuk membuka seluruh konten jika lebih panjang
+                if (content.length >
+                    maxCharacters) // Tampilkan tombol untuk membuka seluruh konten jika lebih panjang
                   TextButton(
                     onPressed: () {
                       showDialog(
