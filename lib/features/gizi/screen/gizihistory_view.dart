@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stunting_project/components/app_text_styles.dart';
-import 'package:stunting_project/data/gizi/children_models.dart';
+
 import 'package:stunting_project/data/gizi/gizi_models.dart';
 import 'package:stunting_project/service/gizi_service.dart';
 import 'package:stunting_project/tokenmanager.dart';
@@ -14,38 +14,25 @@ class GiziHistoryPage extends StatefulWidget {
 
 class _GiziHistoryPageState extends State<GiziHistoryPage> {
   final GiziService _giziService = GiziService();
-  List<Child> _children = [];
-  Child? _selectedChild;
-  List<NutritionHistory> _nutritionHistories = [];
+  List<NutritionHistory> _histories = [];
+  List<String> _childNames = [];
+  String? _selectedChildName;
 
   @override
   void initState() {
     super.initState();
-    _fetchChildren();
+    _fetchNutritionHistories();
   }
 
-  Future<void> _fetchChildren() async {
-    String? accessToken = await TokenManager.getAccessToken();
-    try {
-      List<Child> children = await _giziService.getChildren(accessToken!);
-      setState(() {
-        _children = children;
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal mengambil data anak-anak: $e')),
-      );
-      print('Failed to fetch children data: $e');
-    }
-  }
-
-  Future<void> _fetchNutritionHistories(String childNik) async {
+  Future<void> _fetchNutritionHistories() async {
     String? accessToken = await TokenManager.getAccessToken();
     try {
       List<NutritionHistory> histories =
-          await _giziService.getUserNutritionHistoriesByChild(accessToken!);
+          await _giziService.getUserNutritionHistories(accessToken!);
       setState(() {
-        _nutritionHistories = histories;
+        _histories = histories;
+        _childNames =
+            histories.map((history) => history.childName).toSet().toList();
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -70,41 +57,39 @@ class _GiziHistoryPageState extends State<GiziHistoryPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              if (_children.isNotEmpty)
-                DropdownButtonFormField<Child>(
-                  decoration: const InputDecoration(
-                    labelText: 'Pilih Balita',
-                    border: OutlineInputBorder(),
-                  ),
-                  value: _selectedChild,
-                  items: _children.map((child) {
-                    return DropdownMenuItem<Child>(
-                      value: child,
-                      child: Text(child.childName),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      _selectedChild = newValue;
-                      _fetchNutritionHistories(newValue!.childNik);
-                    });
-                  },
+              DropdownButtonFormField<String>(
+                decoration: const InputDecoration(
+                  labelText: 'Pilih Balita',
+                  border: OutlineInputBorder(),
                 ),
-              const SizedBox(height: 16),
-              if (_selectedChild != null)
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Nama: ${_selectedChild!.childName}'),
-                    Text('NIK: ${_selectedChild!.childNik}'),
-                  ],
+                value: _selectedChildName,
+                onChanged: (value) {
+                  setState(() {
+                    _selectedChildName = value;
+                  });
+                },
+                items: _childNames.map((childName) {
+                  return DropdownMenuItem<String>(
+                    value: childName,
+                    child: Text(childName),
+                  );
+                }).toList(),
+              ),
+              SizedBox(
+                height: 6,
+              ),
+              Center(
+                child: Text(
+                  'Silahkan scroll tabel ke kanan untuk melihat tabel lengkap nya',
+                  style: AppTextStyle.body4Bold,
                 ),
-              const SizedBox(height: 16),
-              if (_nutritionHistories.isNotEmpty)
+              ),
+              if (_histories.isNotEmpty)
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
                     columns: const [
+                      DataColumn(label: Text('Nama')),
                       DataColumn(label: Text('Umur')),
                       DataColumn(label: Text('TB')),
                       DataColumn(label: Text('BB')),
@@ -113,17 +98,23 @@ class _GiziHistoryPageState extends State<GiziHistoryPage> {
                       DataColumn(label: Text('Kategori BB/U')),
                       DataColumn(label: Text('Kategori IMT/U')),
                     ],
-                    rows: _nutritionHistories.map((history) {
-                      return DataRow(cells: [
-                        DataCell(Text('1 bulan')),
-                        DataCell(Text('1 cm')),
-                        DataCell(Text('1 kg')),
-                        DataCell(Text('sqsqsq')),
-                        DataCell(Text('sqsqsqs')),
-                        DataCell(Text('sqsqsq')),
-                        DataCell(Text('sqsqqsq')),
-                      ]);
-                    }).toList(),
+                    rows: _selectedChildName != null
+                        ? _histories
+                            .where((history) =>
+                                history.childName == _selectedChildName)
+                            .map((history) {
+                            return DataRow(cells: [
+                              DataCell(Text(history.childName)),
+                              DataCell(Text(history.ageText)),
+                              DataCell(Text(history.height.toString())),
+                              DataCell(Text(history.weight.toString())),
+                              DataCell(Text(history.bmi.toString())),
+                              DataCell(Text(history.heightCategory)),
+                              DataCell(Text(history.massCategory)),
+                              DataCell(Text(history.weightCategory)),
+                            ]);
+                          }).toList()
+                        : [],
                   ),
                 ),
             ],

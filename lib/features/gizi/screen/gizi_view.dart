@@ -23,6 +23,8 @@ class _GiziPageState extends State<GiziPage> {
   String _selectedKelurahan = '';
   String _gender = '';
   String ageBabyText = '';
+  bool _isEditMode = false;
+  List<String> _childNames = [];
 
   final TextEditingController namaController = TextEditingController();
   final TextEditingController nikController = TextEditingController();
@@ -35,28 +37,14 @@ class _GiziPageState extends State<GiziPage> {
   NutritionHistory? _selectedHistory;
 
   List<Child> _children = [];
+  String? _selectedChildName;
   Child? _selectedChild;
 
   @override
   void initState() {
     super.initState();
-    _fetchChildren();
+    _isEditMode = false;
     _fetchNutritionHistories();
-  }
-
-  Future<void> _fetchChildren() async {
-    String? accessToken = await TokenManager.getAccessToken();
-    try {
-      List<Child> children = await _giziService.getChildren(accessToken!);
-      setState(() {
-        _children = children;
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal mengambil data anak-anak: $e')),
-      );
-      print('Failed to fetch children data: $e');
-    }
   }
 
   Future<void> _fetchNutritionHistories() async {
@@ -66,13 +54,25 @@ class _GiziPageState extends State<GiziPage> {
           await _giziService.getUserNutritionHistories(accessToken!);
       setState(() {
         _histories = histories;
+        _childNames =
+            histories.map((history) => history.childName).toSet().toList();
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal mengambil data riwayat nutrisi: $e')),
-      );
-      print('Failed to fetch nutrition histories: $e');
+      // ...
     }
+  }
+
+  void _fillFormWithHistory(NutritionHistory history) {
+    setState(() {
+      _selectedHistory = history;
+      namaController.text = history.childName;
+      nikController.text = history.childNik;
+      DateTime dateTime = DateTime.parse(history.dateOfBirth);
+      dateController.text = formatter.format(dateTime);
+
+      _gender = history.gender;
+      _selectedKelurahan = history.childVillage;
+    });
   }
 
   String calculateAgeText(DateTime dateOfBirth) {
@@ -96,22 +96,8 @@ class _GiziPageState extends State<GiziPage> {
     });
   }
 
-  void _fillFormWithChild(Child child) {
-    setState(() {
-      _selectedChild = child;
-      namaController.text = child.childName;
-      nikController.text = child.childNik;
-      birthDate = (child.dateOfBirth);
-      dateController.text = formatter.format(birthDate!);
-      ageBabyText = calculateAgeText(birthDate!);
-      _gender = child.gender;
-      // Don't fill in height and weight
-    });
-  }
-
   void _submitForm() async {
     String? accessToken = await TokenManager.getAccessToken();
-
     if (_formKey.currentState!.validate() && _gender.isNotEmpty) {
       String ageText =
           calculateAgeText(birthDate ?? DateTime.now()); // Use birthDate
@@ -196,72 +182,6 @@ class _GiziPageState extends State<GiziPage> {
     );
   }
 
-  Future<void> _updateChild() async {
-    if (_selectedChild == null) return;
-
-    String? accessToken = await TokenManager.getAccessToken();
-
-    try {
-      NutritionHistory updatedHistory =
-          await _giziService.updateNutritionHistory(
-        nutritionHistoryId: _selectedChild!.id, // Use the selected child's ID
-        ageInMonth:
-            calculateAgeText(birthDate ?? DateTime.now()), // Use birthDate
-        height: tinggiController.text,
-        weight: beratController.text,
-        token: accessToken!,
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Data berhasil diperbarui')),
-      );
-
-      // Refresh the list of nutrition histories after update
-      _fetchNutritionHistories();
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal memperbarui data: $e')),
-      );
-    }
-  }
-
-  Future<void> _deleteChild() async {
-    if (_selectedChild == null) return;
-
-    String? accessToken = await TokenManager.getAccessToken();
-
-    try {
-      await _giziService.deleteNutritionHistoryById(
-        nutritionHistoryId: _selectedChild!.id, // Use the selected child's ID
-        token: accessToken!,
-      );
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Data berhasil dihapus')),
-      );
-
-      // Refresh the list of children after deletion
-      _fetchChildren();
-
-      // Reset the form and selected child
-      setState(() {
-        _selectedChild = null;
-        namaController.clear();
-        nikController.clear();
-        tinggiController.clear();
-        beratController.clear();
-        dateController.clear();
-        ageBabyText = '';
-        _gender = '';
-        _selectedKelurahan = '';
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Gagal menghapus data: $e')),
-      );
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -290,31 +210,42 @@ class _GiziPageState extends State<GiziPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (_children.isNotEmpty)
-                  DropdownButtonFormField<Child>(
+                if (_histories.isNotEmpty)
+                  DropdownButtonFormField<String>(
                     decoration: const InputDecoration(
                       labelText: 'Pilih Balita',
                       border: OutlineInputBorder(),
                     ),
-                    value: _selectedChild,
-                    items: _children.map((child) {
-                      return DropdownMenuItem<Child>(
-                        value: child,
-                        child: Text(child.childName),
-                      );
-                    }).toList(),
-                    onChanged: (newValue) {
+                    value: _selectedChildName,
+                    onChanged: (
+                      value,
+                    ) {
                       setState(() {
-                        _selectedChild = newValue;
-                        _fillFormWithChild(
-                            newValue!); // Pass newValue (Child) to method
+                        _selectedChildName = value;
+                        _selectedHistory = _histories.firstWhere(
+                          (history) => history.childName == value,
+                        );
+                        if (_selectedHistory != null) {
+                          _fillFormWithHistory(_selectedHistory!);
+                          birthDate = DateTime.parse(_selectedHistory!
+                              .dateOfBirth); // Set birthDate here
+                          _cekUmur(); // Call _cekUmur here
+                        }
+                        _isEditMode = false;
                       });
                     },
+                    items: _childNames.map((childName) {
+                      return DropdownMenuItem<String>(
+                        value: childName,
+                        child: Text(childName),
+                      );
+                    }).toList(),
                   ),
                 const SizedBox(height: 16),
                 TextFormField(
                   controller: namaController,
                   decoration: const InputDecoration(labelText: 'Nama Balita'),
+                  enabled: _isEditMode || _selectedHistory == null,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Nama Balita tidak boleh kosong';
@@ -331,6 +262,7 @@ class _GiziPageState extends State<GiziPage> {
                     FilteringTextInputFormatter.digitsOnly,
                     LengthLimitingTextInputFormatter(16),
                   ],
+                  enabled: _isEditMode || _selectedHistory == null,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'NIK tidak boleh kosong';
@@ -347,6 +279,8 @@ class _GiziPageState extends State<GiziPage> {
                         decoration:
                             const InputDecoration(labelText: 'Tanggal Lahir'),
                         keyboardType: TextInputType.datetime,
+                        enabled: _isEditMode ||
+                            _selectedHistory == null, // Add this line
                         onTap: () async {
                           DateTime? pickedDate = await showDatePicker(
                             context: context,
@@ -373,37 +307,43 @@ class _GiziPageState extends State<GiziPage> {
                     ElevatedButton(onPressed: _cekUmur, child: Text('Cek Umur'))
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 Text(
-                  'Umur Balita : ' + ageBabyText,
+                  'Umur Balita :' + ageBabyText,
+                  style: AppTextStyle.body2Regular,
                 ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  decoration: const InputDecoration(
-                    labelText: 'Kelurahan',
-                    border: OutlineInputBorder(),
+                SizedBox(
+                  height: 16,
+                ),
+                AbsorbPointer(
+                  absorbing: !(_isEditMode || _selectedHistory == null),
+                  child: DropdownButtonFormField<String>(
+                    decoration: const InputDecoration(
+                      labelText: 'Kelurahan',
+                      border: OutlineInputBorder(),
+                    ),
+                    value: _selectedKelurahan.isNotEmpty
+                        ? _selectedKelurahan
+                        : null,
+                    items: listKelurahan.map((kelurahan) {
+                      return DropdownMenuItem<String>(
+                        value: kelurahan,
+                        child: Text(kelurahan),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() {
+                        _selectedKelurahan = newValue!;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Kelurahan tidak boleh kosong';
+                      }
+                      return null;
+                    },
                   ),
-                  value:
-                      _selectedKelurahan.isNotEmpty ? _selectedKelurahan : null,
-                  items: listKelurahan.map((kelurahan) {
-                    return DropdownMenuItem<String>(
-                      value: kelurahan,
-                      child: Text(kelurahan),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      _selectedKelurahan = newValue!;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Kelurahan tidak boleh kosong';
-                    }
-                    return null;
-                  },
                 ),
-                const SizedBox(height: 16),
                 Row(
                   children: [
                     const Text('Jenis Kelamin:'),
@@ -490,12 +430,12 @@ class _GiziPageState extends State<GiziPage> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       ElevatedButton(
-                        onPressed: _updateChild,
+                        onPressed: () {},
                         child: const Text('Perbarui Data'),
                       ),
                       const SizedBox(height: 8.0),
                       ElevatedButton(
-                        onPressed: _deleteChild,
+                        onPressed: () {},
                         child: const Text('Hapus Data'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor:

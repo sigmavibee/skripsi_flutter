@@ -24,6 +24,10 @@ class ArticleCard extends StatelessWidget {
   Widget build(BuildContext context) {
     String limitedContent = content.substring(0,
         maxCharacters); // Ambil karakter pertama hingga maksimum yang ditentukan
+    if (content.length > maxCharacters) {
+      limitedContent +=
+          '...'; // Tambahkan string "..." jika konten lebih panjang dari maxCharacters
+    }
     return Card(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,30 +53,6 @@ class ArticleCard extends StatelessWidget {
                   data: limitedContent,
                   style: {'p': Style(fontSize: FontSize(16))},
                 ),
-                if (content.length >
-                    maxCharacters) // Tampilkan tombol untuk membuka seluruh konten jika lebih panjang
-                  TextButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Full Content'),
-                            content: SingleChildScrollView(
-                              child: Html(data: content),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: const Text('Close'),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                    child: const Text('Klik untuk membaca selengkapnya'),
-                  ),
               ],
             ),
           ),

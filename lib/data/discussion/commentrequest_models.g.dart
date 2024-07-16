@@ -15,5 +15,5 @@ CreateCommentRequest _$CreateCommentRequestFromJson(
 Map<String, dynamic> _$CreateCommentRequestToJson(
         CreateCommentRequest instance) =>
     <String, dynamic>{
-      'post_content': instance.commentContent,
+      'comment_content': instance.commentContent,
     };

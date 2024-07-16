@@ -117,100 +117,6 @@ class GiziService {
     }
   }
 
-  Future<List<Child>> getChildren(String token) async {
-    try {
-      final response = await _dio.get(
-        getChildrenPath,
-        options: Options(headers: {
-          'Authorization': 'Bearer $token',
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        List<dynamic> data = response.data['data'];
-
-        // Debugging: Log the raw data received
-        print('Received data: $data');
-
-        // Process and validate each child entry
-        return data.map((childJson) {
-          try {
-            // Attempt to parse each child entry
-            return Child.fromJson(childJson);
-          } catch (e) {
-            // Log details of the error and the problematic data
-            print('Error parsing child data: $childJson');
-            print('Error details: $e');
-            // Optionally: rethrow or return a default/fallback Child object
-            throw Exception('Failed to parse child data: $e');
-          }
-        }).toList();
-      } else {
-        throw Exception('Failed to get children data');
-      }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final errorData = e.response!.data;
-        final errorCode = errorData['code'];
-        final errorMessage = errorData['message'];
-        throw Exception('$errorCode: $errorMessage');
-      } else {
-        throw Exception('Failed to connect to server');
-      }
-    } catch (e) {
-      // Log any other unexpected errors
-      print('Unexpected error: $e');
-      throw Exception('An unexpected error occurred: $e');
-    }
-  }
-
-  Future<List<Child>> getChildrenById(String token) async {
-    try {
-      final response = await _dio.get(
-        getChildrenIdPath,
-        options: Options(headers: {
-          'Authorization': 'Bearer $token',
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        List<dynamic> data = response.data['data'];
-
-        // Debugging: Log the raw data received
-        print('Received data: $data');
-
-        // Process and validate each child entry
-        return data.map((childJson) {
-          try {
-            // Attempt to parse each child entry
-            return Child.fromJson(childJson);
-          } catch (e) {
-            // Log details of the error and the problematic data
-            print('Error parsing child data: $childJson');
-            print('Error details: $e');
-            // Optionally: rethrow or return a default/fallback Child object
-            throw Exception('Failed to parse child data: $e');
-          }
-        }).toList();
-      } else {
-        throw Exception('Failed to get children data');
-      }
-    } on DioException catch (e) {
-      if (e.response != null) {
-        final errorData = e.response!.data;
-        final errorCode = errorData['code'];
-        final errorMessage = errorData['message'];
-        throw Exception('$errorCode: $errorMessage');
-      } else {
-        throw Exception('Failed to connect to server');
-      }
-    } catch (e) {
-      // Log any other unexpected errors
-      print('Unexpected error: $e');
-      throw Exception('An unexpected error occurred: $e');
-    }
-  }
-
   Future<List<NutritionHistory>> getUserNutritionHistoriesByChild(
       String accessToken) async {
     try {
@@ -330,6 +236,100 @@ class GiziService {
       } else {
         throw Exception('Failed to connect to server');
       }
+    }
+  }
+
+  Future<List<Child>> getChildren(String token) async {
+    try {
+      final response = await _dio.get(
+        getChildrenPath,
+        options: Options(headers: {
+          'Authorization': 'Bearer $token',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data['data'];
+
+        // Debugging: Log the raw data received
+        print('Received data: $data');
+
+        // Process and validate each child entry
+        return data.map((childJson) {
+          try {
+            // Attempt to parse each child entry
+            return Child.fromJson(childJson);
+          } catch (e) {
+            // Log details of the error and the problematic data
+            print('Error parsing child data: $childJson');
+            print('Error details: $e');
+            // Optionally: rethrow or return a default/fallback Child object
+            throw Exception('Failed to parse child data: $e');
+          }
+        }).toList();
+      } else {
+        throw Exception('Failed to get children data');
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        final errorData = e.response!.data;
+        final errorCode = errorData['code'];
+        final errorMessage = errorData['message'];
+        throw Exception('$errorCode: $errorMessage');
+      } else {
+        throw Exception('Failed to connect to server');
+      }
+    } catch (e) {
+      // Log any other unexpected errors
+      print('Unexpected error: $e');
+      throw Exception('An unexpected error occurred: $e');
+    }
+  }
+
+  Future<List<Child>> getChildrenById(String token) async {
+    try {
+      final response = await _dio.get(
+        getChildrenIdPath,
+        options: Options(headers: {
+          'Authorization': 'Bearer $token',
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data['data'];
+
+        // Debugging: Log the raw data received
+        print('Received data: $data');
+
+        // Process and validate each child entry
+        return data.map((childJson) {
+          try {
+            // Attempt to parse each child entry
+            return Child.fromJson(childJson);
+          } catch (e) {
+            // Log details of the error and the problematic data
+            print('Error parsing child data: $childJson');
+            print('Error details: $e');
+            // Optionally: rethrow or return a default/fallback Child object
+            throw Exception('Failed to parse child data: $e');
+          }
+        }).toList();
+      } else {
+        throw Exception('Failed to get children data');
+      }
+    } on DioException catch (e) {
+      if (e.response != null) {
+        final errorData = e.response!.data;
+        final errorCode = errorData['code'];
+        final errorMessage = errorData['message'];
+        throw Exception('$errorCode: $errorMessage');
+      } else {
+        throw Exception('Failed to connect to server');
+      }
+    } catch (e) {
+      // Log any other unexpected errors
+      print('Unexpected error: $e');
+      throw Exception('An unexpected error occurred: $e');
     }
   }
 }

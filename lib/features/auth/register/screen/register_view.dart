@@ -19,14 +19,11 @@ class _RegisterPageState extends State<RegisterPage> {
   final AuthService _authService = AuthService();
 
   Future<void> _register() async {
-    print('Register button clicked');
     final String username = _usernameController.text;
     final String email = _emailController.text;
     final String password = _passwordController.text;
 
     final result = await _authService.register(username, email, password);
-
-    print('Registration result: $result');
 
     if (result['success']) {
       // Navigate to the login page after successful registration
@@ -38,8 +35,6 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
       // You can handle the registered user data as required
-      print('Registered Username: ${result['data']['username']}');
-      print('Registered Email: ${result['data']['email']}');
     } else {
       _showSnackBar(result['message']);
     }
@@ -68,10 +63,16 @@ class _RegisterPageState extends State<RegisterPage> {
                     style: AppTextStyle.heading4Bold
                         .copyWith(color: const Color.fromARGB(255, 34, 14, 14)),
                   ),
-                  const SizedBox(height: 24.0),
-                  Text(
-                    'Masukan data diri anda untuk membuat akun',
-                    style: AppTextStyle.body2Medium.copyWith(color: Colors.black),
+                  const SizedBox(height: 8.0),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'Silahkan daftar untuk membuat akun!',
+                        style: AppTextStyle.body2Bold
+                            .copyWith(color: Colors.black),
+                      ),
+                    ],
                   ),
                   InputLayout(
                     'Nama',
@@ -84,7 +85,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     'Email',
                     TextFormField(
                       controller: _emailController,
-                      decoration: customInputDecoration('Masukkan alamat email anda'),
+                      decoration:
+                          customInputDecoration('Masukkan alamat email anda'),
                     ),
                   ),
                   InputLayout(
@@ -92,10 +94,13 @@ class _RegisterPageState extends State<RegisterPage> {
                     TextFormField(
                       controller: _passwordController,
                       obscureText: !_isPasswordVisible,
-                      decoration: customInputDecoration('Masukkan password').copyWith(
+                      decoration:
+                          customInputDecoration('Masukkan password').copyWith(
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                            _isPasswordVisible
+                                ? Icons.visibility
+                                : Icons.visibility_off,
                           ),
                           onPressed: () {
                             setState(() {
@@ -160,13 +165,16 @@ class _RegisterPageState extends State<RegisterPage> {
                 ],
               ),
             ),
-            // if (state.status.isSubmissionInProgress)
-            //   Container(
-            //     width: MediaQuery.of(context).size.width,
-            //     height: MediaQuery.of(context).size.height,
-            //     color: Colors.black54,
-            //     child: const Center(child: CircularProgressIndicator.adaptive()),
-            //   ),
+            Positioned(
+              bottom: -50,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: EdgeInsets.all(48),
+                child: Image.asset(
+                    'assets/iconreg.png'), // Fix: removed extra 's' in 'assetes'
+              ),
+            ),
           ],
         ),
       ),

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:stunting_project/features/profile/screen/editprofile_view.dart';
 import 'package:stunting_project/features/splash/splash_page.dart';
 
-import 'data/consultation/consultation_list.dart';
 import 'features/article/screen/article_view.dart';
 import 'features/auth/login/screen/login_view.dart';
 import 'features/auth/register/screen/register_view.dart';
@@ -37,12 +36,12 @@ class MyApp extends StatelessWidget {
         'register': (context) => const RegisterPage(),
         '/': (context) => HomePage(),
         'article': (context) => ArticlePage(),
-        'gizi':(context) =>  GiziPage(),
-        'gizihistory':(context) => const GiziHistoryPage(),
+        'gizi': (context) => GiziPage(),
+        'gizihistory': (context) => GiziHistoryPage(),
         'discussion': (context) => DiscussionPage(),
-        'consultation': (context) => ConsultationPage(consultationData: consultationData),
-        'profile':(context) => const ProfileEdit(),
-              },
+        'consultation': (context) => ConsultationPage(),
+        'profile': (context) => const ProfileEdit(),
+      },
     );
   }
 }

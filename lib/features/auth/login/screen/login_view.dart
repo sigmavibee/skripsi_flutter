@@ -75,8 +75,20 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
                 const SizedBox(height: 6.0),
+                Row(
+                  children: [
+                    Flexible(
+                      child: Image.asset(
+                        'assets/icon_bg.png',
+                        width: MediaQuery.of(context).size.height * 0.45,
+                        height: MediaQuery.of(context).size.height * 0.45,
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                  ],
+                ),
                 Text(
-                  'Masukkan kredensial anda untuk masuk ke akun',
+                  'Silahkan login untuk melanjutkan!',
                   style: AppTextStyle.body2Medium.copyWith(color: Colors.black),
                 ),
                 InputLayout(
@@ -123,6 +135,33 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     onPressed: _login, // Call the login function
                   ),
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      'Belum punya akun?',
+                      style: TextStyle(
+                          color: Color(0xFF000000),
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    TextButton(
+                        onPressed: () {
+                          Navigator.pushNamed(context, 'register');
+                        },
+                        style: ButtonStyle(
+                          overlayColor: WidgetStateColor.resolveWith(
+                              (_) => Colors.white.withOpacity(0.1)),
+                        ),
+                        child: const Text(
+                          'Membuat akun',
+                          style: TextStyle(
+                              color: Color(0xFFFAB317),
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.w600),
+                        )),
+                  ],
                 ),
               ],
             ),
