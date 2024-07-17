@@ -94,14 +94,13 @@ class _ConsultationPageState extends State<ConsultationPage> {
           ),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundImage:
-                  NetworkImage(consultation.consultantProfile ?? ''),
+              backgroundImage: NetworkImage(consultation.consultantProfile),
             ),
-            title: Text(consultation.consultantUsername ?? ''),
-            subtitle: Text(consultation.consultantDescription ?? ''),
+            title: Text(consultation.consultantUsername),
+            subtitle: Text(consultation.consultantDescription),
             trailing: InkWell(
               onTap: () {
-                _openWhatsApp(consultation.consultantPhone ?? '');
+                _openWhatsApp(consultation.consultantPhone);
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),

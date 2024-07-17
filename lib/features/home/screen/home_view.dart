@@ -45,27 +45,39 @@ class _HomeFull extends State<HomeFull> {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('refreshToken');
   }
+
   Future<String?> _getAccessToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('accessToken');
   }
 
   Future<void> _fetchAccessToken() async {
-  setState(() {
-    _isLoading = true;
-  });
+    setState(() {
+      _isLoading = true;
+    });
 
-  final prefs = await SharedPreferences.getInstance();
-  final accessToken = prefs.getString('accessToken');
-  if (accessToken != null) {
-    final profileData = await _authService.getUserInfo(accessToken);
-    if (profileData['success']) {
+    final prefs = await SharedPreferences.getInstance();
+    final accessToken = prefs.getString('accessToken');
+    if (accessToken != null) {
+      final profileData = await _authService.getUserInfo(accessToken);
+      if (profileData['success']) {
+        setState(() {
+          _username = profileData['data']['username'];
+          _avatarUrl = profileData['data']['profile'];
+          _isLoading = false;
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Invalid or expired token. Please login again.'),
+          ),
+        );
+        Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
+      }
+    } else {
       setState(() {
-        _username = profileData['data']['username'];
-        _avatarUrl = profileData['data']['profile'];
         _isLoading = false;
       });
-    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Invalid or expired token. Please login again.'),
@@ -73,18 +85,7 @@ class _HomeFull extends State<HomeFull> {
       );
       Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
     }
-  } else {
-    setState(() {
-      _isLoading = false;
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Invalid or expired token. Please login again.'),
-      ),
-    );
-    Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
   }
-}
 
   Future<void> _fetchUserInfo(String accessToken) async {
     final profileData = await _authService.getUserInfo(accessToken);
@@ -104,7 +105,8 @@ class _HomeFull extends State<HomeFull> {
   Future<void> _logoutUser() async {
     final refreshToken = await _getRefreshToken(); // Retrieve refresh token
     if (refreshToken != null) {
-      final logoutResult = await _authService.logout(refreshToken); // Use refresh token for logout
+      final logoutResult = await _authService
+          .logout(refreshToken); // Use refresh token for logout
       if (logoutResult['success']) {
         await _clearTokens();
         Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
@@ -201,80 +203,115 @@ class _HomeFull extends State<HomeFull> {
         ],
       ),
       body: _isLoading
-        ? const Center(child: CircularProgressIndicator()) // Show loading indicator
-        : _selectedIndex == 0
-            ? SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 7, // Takes 7/8 of the space
-                          child: ProfileCard(
-                            username: _username,
-                            avatarUrl: _avatarUrl,
-                            onTap: () {
-                              Navigator.pushNamed(context, 'profile');
-                            },
+          ? const Center(
+              child: CircularProgressIndicator()) // Show loading indicator
+          : _selectedIndex == 0
+              ? SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 7, // Takes 7/8 of the space
+                            child: ProfileCard(
+                              username: _username,
+                              avatarUrl: _avatarUrl,
+                              onTap: () {
+                                Navigator.pushNamed(context, 'profile');
+                              },
+                            ),
                           ),
+                          Expanded(
+                            flex: 1, // Takes 1/8 of the space
+                            child: SizedBox(
+                              height: 100,
+                              width: 100,
+                              child: Card(
+                                child: IconButton(
+                                  icon: const Icon(Icons.exit_to_app),
+                                  onPressed: _logoutUser,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      BannerWidget(),
+                      const Text('Artikel Populer',
+                          style: AppTextStyle.heading5Bold),
+                      const SizedBox(
+                        height: 268, // Set a height to avoid overflow error
+                        child: ArticlePopular(),
+                      ),
+                      Card(
+                        elevation: 4,
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        Expanded(
-                          flex: 1, // Takes 1/8 of the space
-                          child: SizedBox(
-                            height: 100,
-                            child: Card(
-                              child: IconButton(
-                                icon: const Icon(Icons.exit_to_app),
-                                onPressed: _logoutUser,
+                        child: Container(
+                          width: double
+                              .infinity, // Make the card width match its parent
+                          height: 60, // Set the card height
+                          child: Center(
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.pushNamed(context, 'about');
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.info_outline),
+                                  Text(
+                                    '  Tentang Kami',
+                                    style: AppTextStyle.heading5Bold,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                    BannerWidget(),
-                    const Text('Artikel Populer', style: AppTextStyle.heading5Bold),
-                    const SizedBox(
-                      height: 268, // Set a height to avoid overflow error
-                      child: ArticlePopular(),
-                    ),
-                  ],
-                ),
-              )
-            : ArticlePage(),
-    bottomNavigationBar: BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: Colors.white,
-      currentIndex: _selectedIndex,
-      onTap: _onItemTapped,
-      selectedItemColor: successColor,
-      selectedFontSize: 14,
-      unselectedItemColor: Colors.grey[800],
-      unselectedFontSize: 12,
-      showSelectedLabels: true,
-      showUnselectedLabels: true,
-      items: const <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-          icon: Icon(Icons.dashboard_outlined),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.book_outlined),
-          label: 'Artikel',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.food_bank_outlined),
-          label: 'Gizi',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.chat_outlined),
-          label: 'Diskusi',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.medical_services_outlined),
-          label: 'Konsultasi',
-        ),
-      ],
-    ),
-  );
-}}
+                      )
+                    ],
+                  ),
+                )
+              : ArticlePage(),
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        selectedItemColor: successColor,
+        selectedFontSize: 14,
+        unselectedItemColor: Colors.grey[800],
+        unselectedFontSize: 12,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_outlined),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.book_outlined),
+            label: 'Artikel',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.food_bank_outlined),
+            label: 'Gizi',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_outlined),
+            label: 'Diskusi',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.medical_services_outlined),
+            label: 'Konsultasi',
+          ),
+        ],
+      ),
+    );
+  }
+}

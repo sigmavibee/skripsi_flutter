@@ -53,126 +53,132 @@ class _RegisterPageState extends State<RegisterPage> {
         body: Stack(
           children: [
             SafeArea(
-              child: ListView(
+              child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.all(32.0),
-                children: [
-                  Text(
-                    'Daftar',
-                    textAlign: TextAlign.center,
-                    style: AppTextStyle.heading4Bold
-                        .copyWith(color: const Color.fromARGB(255, 34, 14, 14)),
-                  ),
-                  const SizedBox(height: 8.0),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Silahkan daftar untuk membuat akun!',
-                        style: AppTextStyle.body2Bold
-                            .copyWith(color: Colors.black),
-                      ),
-                    ],
-                  ),
-                  InputLayout(
-                    'Nama',
-                    TextFormField(
-                      controller: _usernameController,
-                      decoration: customInputDecoration("Masukkan nama anda"),
+                child: Column(
+                  children: [
+                    Text(
+                      'Daftar',
+                      textAlign: TextAlign.center,
+                      style: AppTextStyle.heading4Bold.copyWith(
+                          color: const Color.fromARGB(255, 34, 14, 14)),
                     ),
-                  ),
-                  InputLayout(
-                    'Email',
-                    TextFormField(
-                      controller: _emailController,
-                      decoration:
-                          customInputDecoration('Masukkan alamat email anda'),
-                    ),
-                  ),
-                  InputLayout(
-                    'Password',
-                    TextFormField(
-                      controller: _passwordController,
-                      obscureText: !_isPasswordVisible,
-                      decoration:
-                          customInputDecoration('Masukkan password').copyWith(
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isPasswordVisible
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isPasswordVisible = !_isPasswordVisible;
-                            });
-                          },
+                    const SizedBox(height: 8.0),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Silahkan daftar untuk membuat akun!',
+                          style: AppTextStyle.body2Bold
+                              .copyWith(color: Colors.black),
                         ),
+                      ],
+                    ),
+                    InputLayout(
+                      'Nama',
+                      TextFormField(
+                        controller: _usernameController,
+                        decoration: customInputDecoration("Masukkan nama anda"),
                       ),
                     ),
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(top: 20),
-                    width: double.infinity,
-                    child: FilledButton(
-                      style: buttonStyle,
-                      child: Text(
-                        'Daftar',
-                        style: AppTextStyle.body2Medium.copyWith(
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
-                        ),
+                    InputLayout(
+                      'Email',
+                      TextFormField(
+                        controller: _emailController,
+                        decoration:
+                            customInputDecoration('Masukkan alamat email anda'),
                       ),
-                      onPressed: _register, // Call the register function
                     ),
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Sudah punya akun?',
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 16.0,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const LoginPage(),
+                    InputLayout(
+                      'Password',
+                      TextFormField(
+                        controller: _passwordController,
+                        obscureText: !_isPasswordVisible,
+                        decoration:
+                            customInputDecoration('Masukkan password').copyWith(
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isPasswordVisible
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
                             ),
-                          );
-                        },
-                        style: ButtonStyle(
-                          overlayColor: WidgetStateColor.resolveWith(
-                            (_) => Colors.black.withOpacity(0.1),
+                            onPressed: () {
+                              setState(() {
+                                _isPasswordVisible = !_isPasswordVisible;
+                              });
+                            },
                           ),
                         ),
-                        child: const Text(
-                          'Masuk',
-                          style: TextStyle(
-                            color: Color(0xFFFAB317),
-                            fontSize: 16.0,
+                      ),
+                    ),
+                    Container(
+                      margin: const EdgeInsets.only(top: 20),
+                      width: double.infinity,
+                      child: FilledButton(
+                        style: buttonStyle,
+                        child: Text(
+                          'Daftar',
+                          style: AppTextStyle.body2Medium.copyWith(
+                            color: Colors.black,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
+                        onPressed: _register, // Call the register function
                       ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: -50,
-              left: 0,
-              right: 0,
-              child: Container(
-                padding: EdgeInsets.all(48),
-                child: Image.asset(
-                    'assets/iconreg.png'), // Fix: removed extra 's' in 'assetes'
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Sudah punya akun?',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const LoginPage(),
+                                  ),
+                                );
+                              },
+                              style: ButtonStyle(
+                                overlayColor: MaterialStateColor.resolveWith(
+                                  (_) => Colors.black.withOpacity(0.1),
+                                ),
+                              ),
+                              child: const Text(
+                                'Masuk',
+                                style: TextStyle(
+                                  color: Color(0xFFFAB317),
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                            height:
+                                2), // Add some space between the text and the image
+                        Image.asset(
+                          'assets/iconreg.png',
+                          width: MediaQuery.of(context).size.height * 0.45,
+                          height: MediaQuery.of(context).size.height * 0.3,
+                          fit: BoxFit.fill,
+                        ),
+                      ],
+                    )
+                  ],
+                ),
               ),
             ),
           ],

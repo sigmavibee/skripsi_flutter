@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stunting_project/features/about/about_view.dart';
 
 import 'package:stunting_project/features/profile/screen/editprofile_view.dart';
 import 'package:stunting_project/features/splash/splash_page.dart';
@@ -41,6 +42,7 @@ class MyApp extends StatelessWidget {
         'discussion': (context) => DiscussionPage(),
         'consultation': (context) => ConsultationPage(),
         'profile': (context) => const ProfileEdit(),
+        'about': (context) => AboutPage()
       },
     );
   }
