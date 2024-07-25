@@ -1,5 +1,7 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 
 class AuthService {
   final Dio _dio = Dio();
@@ -7,7 +9,8 @@ class AuthService {
   final String host = 'www.givxl33t.site'; // Replace with your API host
   final String loginPath = '/api/auth/login';
   final String registerPath = '/api/auth/register';
-  final String refreshTokenPath = '/api/auth/refresh'; // Add the refresh token endpoint
+  final String refreshTokenPath =
+      '/api/auth/refresh'; // Add the refresh token endpoint
   final String userInfoPath = '/api/auth/me';
   final String logoutPath = '/api/auth/logout';
   final String editProfilePath = '/api/auth/profile';
@@ -46,7 +49,7 @@ class AuthService {
       } else {
         return {
           'success': false,
-          'message': response.statusMessage,
+          'message': response.data['message'],
         };
       }
     } on DioException catch (e) {
@@ -55,7 +58,8 @@ class AuthService {
         if (e.response?.statusCode == 422) {
           errorMessage = e.response?.data['message'] ?? 'Invalid email format';
         } else if (e.response?.statusCode == 400) {
-          errorMessage = e.response?.data['message'] ?? 'Incorrect email or password';
+          errorMessage =
+              e.response?.data['message'] ?? 'Incorrect email or password';
         } else {
           errorMessage = e.response?.data['message'] ?? 'An error occurred';
         }
@@ -68,9 +72,11 @@ class AuthService {
     }
   }
 
-  Future<Map<String, dynamic>> register(String username, String email, String password) async {
-    final String url = '$protocol://$host$registerPath'; // Correct the URL to use the registerPath
-    
+  Future<Map<String, dynamic>> register(
+      String username, String email, String password) async {
+    final String url =
+        '$protocol://$host$registerPath'; // Correct the URL to use the registerPath
+
     try {
       final response = await _dio.post(
         url,
@@ -90,7 +96,7 @@ class AuthService {
       } else {
         return {
           'success': false,
-          'message': 'Password harus menggunakan unsur uppercase',
+          'message': response.data['message'],
         };
       }
     } on DioException catch (e) {
@@ -104,7 +110,7 @@ class AuthService {
             'message': 'Email already exists',
           };
         } else if (statusCode == 422) {
-          if (message == 'password is not strong enough') {
+          if (message == 'Password is not strong enough') {
             return {
               'success': false,
               'message': 'Password is not strong enough',
@@ -229,7 +235,8 @@ class AuthService {
     } on DioException catch (e) {
       return {
         'success': false,
-        'message': 'An error occurred: ${e.response?.data['message'] ?? e.message}',
+        'message':
+            'An error occurred: ${e.response?.data['message'] ?? e.message}',
       };
     }
   }
@@ -240,19 +247,34 @@ class AuthService {
       String email,
       String? currentPassword,
       String? newPassword,
-      File? profileImage
-  ) async {
+      File? profileImage) async {
     final String url = '$protocol://$host$editProfilePath';
 
     try {
       FormData formData = FormData.fromMap({
         'username': username,
         'email': email,
-        'current_password': currentPassword,
-        'password': newPassword,
-        if (profileImage != null)
-          'profile': await MultipartFile.fromFile(profileImage.path, filename: 'profile.jpg'),
       });
+
+      if (newPassword != null) {
+        if (currentPassword == null) {
+          throw Exception('Current password is required to change password');
+        }
+        formData.fields.add(MapEntry('current_password', currentPassword));
+        formData.fields.add(MapEntry('password', newPassword));
+      }
+
+      if (profileImage != null) {
+        final profileImageNew = profileImage.path;
+        var mimeType = lookupMimeType(profileImageNew);
+        formData.files.add(MapEntry(
+          'profile',
+          MultipartFile.fromFileSync(
+            profileImage.path,
+            contentType: mimeType != null ? MediaType.parse(mimeType) : null,
+          ),
+        ));
+      }
 
       final response = await _dio.put(
         url,
@@ -276,12 +298,14 @@ class AuthService {
     } on DioException catch (e) {
       return {
         'success': false,
-        'message': 'An error occurred: ${e.response?.data['message'] ?? e.message}',
+        'message':
+            'An error occurred: ${e.response?.data['message'] ?? e.message}',
       };
     }
   }
 
-  Future<Map<String, dynamic>> getUserById(String userId, String accessToken) async {
+  Future<Map<String, dynamic>> getUserById(
+      String userId, String accessToken) async {
     final String url = '$protocol://$host$userByIdPath$userId';
 
     try {

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:stunting_project/common/shared_widgets/bottom_nav_bar.dart';
+import 'package:stunting_project/common/shared_widgets/custom_app_bar.dart';
+import 'package:stunting_project/data/article/article_models.dart';
 import 'package:stunting_project/service/article_service.dart';
-import '../../../data/article/article_models.dart';
+import 'package:stunting_project/tokenmanager.dart';
 
-import '../../../tokenmanager.dart';
 import '../widget/articlecard_widget.dart';
 import 'articledetail_view.dart';
 
@@ -14,7 +16,13 @@ class ArticlePage extends StatefulWidget {
 class _ArticlePageState extends State<ArticlePage> {
   final ArticleService articleService = ArticleService();
   late Future<List<Article>> futureArticles = Future.value([]);
-
+  final List<String> _routes = [
+    '/',
+    'article',
+    'gizi',
+    'discussion',
+    'consultation',
+  ];
   @override
   void initState() {
     super.initState();
@@ -23,13 +31,11 @@ class _ArticlePageState extends State<ArticlePage> {
 
   void _loadArticles() async {
     String? accessToken = await TokenManager.getAccessToken();
-    print('Access Token: $accessToken');
     if (accessToken != null) {
       setState(() {
         futureArticles = articleService.getArticles();
       });
     } else {
-      // Handle the case where the token is not available
       setState(() {
         futureArticles = Future.error('Access token not found');
       });
@@ -39,6 +45,9 @@ class _ArticlePageState extends State<ArticlePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const CustomAppBarWidget(
+        appBarTitle: 'Artikel',
+      ),
       body: FutureBuilder<List<Article>>(
         future: futureArticles,
         builder: (context, snapshot) {
@@ -47,7 +56,7 @@ class _ArticlePageState extends State<ArticlePage> {
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No articles found'));
+            return const Center(child: Text('No articles found'));
           } else {
             List<Article> articles = snapshot.data!;
             return ListView(
@@ -85,6 +94,22 @@ class _ArticlePageState extends State<ArticlePage> {
             );
           }
         },
+      ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: 1,
+        menuItems: [
+          'Home',
+          'Article',
+          'Gizi',
+          'Diskusi',
+          'Konsultasi',
+        ],
+        routes: _routes,
+        onTap: (index) {
+          Navigator.pushNamed(context, _routes[index]);
+        },
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
       ),
     );
   }

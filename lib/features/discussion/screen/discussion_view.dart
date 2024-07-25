@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:stunting_project/common/shared_widgets/bottom_nav_bar.dart';
 import 'package:stunting_project/data/discussion/discussion_models.dart';
 import 'package:stunting_project/features/discussion/widget/discussion_card.dart';
 import 'package:stunting_project/service/discussion_service.dart';
 import 'package:stunting_project/tokenmanager.dart';
-
+import '../../../common/shared_widgets/custom_app_bar.dart';
 import '../../../data/discussion/discussionrequest_models.dart';
 
 class DiscussionPage extends StatefulWidget {
@@ -23,6 +24,14 @@ class _DiscussionPageState extends State<DiscussionPage> {
   final TextEditingController _contentController = TextEditingController();
 
   final FocusNode _focusNode = FocusNode();
+
+  final List<String> _routes = [
+    '/',
+    'article',
+    'gizi',
+    'discussion',
+    'consultation',
+  ];
 
   @override
   void initState() {
@@ -280,11 +289,8 @@ class _DiscussionPageState extends State<DiscussionPage> {
         return true;
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Discussion',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-          ),
+        appBar: CustomAppBarWidget(
+          appBarTitle: 'Diskusi',
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -345,7 +351,7 @@ class _DiscussionPageState extends State<DiscussionPage> {
                     ] else
                       ElevatedButton(
                         onPressed: _createDiscussion,
-                        child: const Text('Send'),
+                        child: const Text('Post'),
                       ),
                     const SizedBox(height: 5),
                     const Text(
@@ -389,6 +395,23 @@ class _DiscussionPageState extends State<DiscussionPage> {
               ),
             ],
           ),
+        ),
+        bottomNavigationBar: BottomNavBar(
+          currentIndex:
+              3, // assuming the discussion page is the 3rd item in the menu
+          menuItems: [
+            'Home',
+            'Article',
+            'Gizi',
+            'Diskusi',
+            'Konsultasi',
+          ],
+          routes: _routes,
+          onTap: (index) {
+            Navigator.pushNamed(context, _routes[index]);
+          },
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
         ),
       ),
     );

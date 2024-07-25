@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stunting_project/components/app_text_styles.dart';
+import 'package:stunting_project/components/colors.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
 import '../../../data/discussion/discussion_models.dart';
@@ -125,14 +126,14 @@ class _DiscussionCardState extends State<DiscussionCard> {
                         ? Icons.thumb_up
                         : Icons.thumb_up_off_alt,
                     color: widget.discussionData.isLiked
-                        ? Colors.blue
+                        ? successColor
                         : Colors.grey,
                   ),
                   label: Text(
                     widget.discussionData.likeCount.toString(),
                     style: TextStyle(
                       color: widget.discussionData.isLiked
-                          ? Colors.blue
+                          ? successColor
                           : Colors.grey,
                     ),
                   ),
@@ -142,7 +143,7 @@ class _DiscussionCardState extends State<DiscussionCard> {
                     ),
                     side: BorderSide(
                       color: widget.discussionData.isLiked
-                          ? Colors.blue
+                          ? successColor
                           : Colors.transparent,
                     ),
                   ),

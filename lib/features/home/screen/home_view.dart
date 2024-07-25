@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:stunting_project/common/shared_widgets/custom_app_bar.dart';
 import 'package:stunting_project/components/app_text_styles.dart';
-import 'package:stunting_project/components/colors.dart';
 import 'package:stunting_project/features/home/widget/articlepopular_widget.dart';
 import 'package:stunting_project/features/home/widget/profilecard_widget.dart';
-import '../widget/banner_widget.dart';
-import '../../article/screen/article_view.dart';
+import '../../../common/shared_widgets/about_card_widget.dart';
+import '../../../common/shared_widgets/bottom_nav_bar.dart';
 import '../../../service/auth_service.dart';
+import '../widget/banner_widget.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -26,19 +27,34 @@ class HomeFull extends StatefulWidget {
 
 class _HomeFull extends State<HomeFull> {
   int _selectedIndex = 0;
-  String _appBarTitle = 'Home';
-  String _previousAppBarTitle = '';
+  String _appBarTitle = '';
   bool _isLoading = false;
   String? _username;
   String? _avatarUrl;
+  String? accessToken;
 
   final AuthService _authService = AuthService();
-  String? accessToken;
+
+  final List<String> _menuItems = [
+    'Home',
+    'Article',
+    'Gizi',
+    'Diskusi',
+    'Konsultasi',
+  ];
+
+  final List<String> _routes = [
+    '/',
+    'article',
+    'gizi',
+    'discussion',
+    'consultation',
+  ];
 
   @override
   void initState() {
     super.initState();
-    _fetchAccessToken();
+    _fetchAccessTokenAndUserInfo();
   }
 
   Future<String?> _getRefreshToken() async {
@@ -46,12 +62,7 @@ class _HomeFull extends State<HomeFull> {
     return prefs.getString('refreshToken');
   }
 
-  Future<String?> _getAccessToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString('accessToken');
-  }
-
-  Future<void> _fetchAccessToken() async {
+  Future<void> _fetchAccessTokenAndUserInfo() async {
     setState(() {
       _isLoading = true;
     });
@@ -59,27 +70,19 @@ class _HomeFull extends State<HomeFull> {
     final prefs = await SharedPreferences.getInstance();
     final accessToken = prefs.getString('accessToken');
     if (accessToken != null) {
-      final profileData = await _authService.getUserInfo(accessToken);
-      if (profileData['success']) {
-        setState(() {
-          _username = profileData['data']['username'];
-          _avatarUrl = profileData['data']['profile'];
-          _isLoading = false;
-        });
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Invalid or expired token. Please login again.'),
-          ),
-        );
-        Navigator.pushNamedAndRemoveUntil(context, 'login', (route) => false);
-      }
+      setState(() {
+        this.accessToken = accessToken;
+      });
+      await _fetchUserInfo(accessToken);
+      setState(() {
+        _isLoading = false;
+      });
     } else {
       setState(() {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Invalid or expired token. Please login again.'),
         ),
       );
@@ -89,7 +92,7 @@ class _HomeFull extends State<HomeFull> {
 
   Future<void> _fetchUserInfo(String accessToken) async {
     final profileData = await _authService.getUserInfo(accessToken);
-    print('Access Token: $accessToken');
+
     if (profileData['success']) {
       setState(() {
         _username = profileData['data']['username'];
@@ -128,189 +131,66 @@ class _HomeFull extends State<HomeFull> {
     await prefs.remove('refreshToken');
   }
 
-  Future<void> _onItemTapped(int index) async {
-    if (index == 2 || index == 3 || index == 4) {
-      int previousIndex = _selectedIndex;
-      final result = await Navigator.pushNamed(context, _getRouteName(index));
-      if (result != null && result is int) {
-        setState(() {
-          _selectedIndex = result;
-          _appBarTitle = _getAppBarTitle(result);
-        });
-      } else {
-        setState(() {
-          _selectedIndex = previousIndex;
-          _appBarTitle = _previousAppBarTitle;
-        });
-      }
-    } else {
-      setState(() {
-        _selectedIndex = index;
-        _previousAppBarTitle = _appBarTitle;
-        _appBarTitle = _getAppBarTitle(index);
-      });
-    }
-  }
-
-  String _getAppBarTitle(int index) {
-    switch (index) {
-      case 0:
-        return 'Home';
-      case 1:
-        return 'Article';
-      default:
-        return 'Home';
-    }
-  }
-
-  String _getRouteName(int index) {
-    switch (index) {
-      case 2:
-        return 'gizi';
-      case 3:
-        return 'discussion';
-      case 4:
-        return 'consultation';
-      default:
-        return 'home';
-    }
+  Widget _getBody() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                flex: 7, // Takes 7/8 of the space
+                child: ProfileCard(
+                  username: _username,
+                  avatarUrl: _avatarUrl,
+                  onTap: () {
+                    Navigator.pushNamed(context, 'profile');
+                  },
+                ),
+              ),
+              Expanded(
+                flex: 1, // Takes 1/8 of the space
+                child: SizedBox(
+                  height: 100,
+                  width: 100,
+                  child: Card(
+                    child: IconButton(
+                      icon: const Icon(Icons.exit_to_app),
+                      onPressed: _logoutUser,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          BannerWidget(),
+          const Text('Artikel Populer', style: AppTextStyle.heading5Bold),
+          const SizedBox(
+            height: 268, // Set a height to avoid overflow error
+            child: ArticlePopular(),
+          ),
+          // AboutCardWidget(context: context)
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: successColor,
-        title: Text(_appBarTitle, style: AppTextStyle.heading4Bold),
-        automaticallyImplyLeading: false,
-        actions: [
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16.0),
-            padding: const EdgeInsets.all(8.0),
-            child: Image.asset(
-              'assets/logo_puskesmas.png',
-              width: 20,
-              height: 25,
-              fit: BoxFit.contain,
-            ),
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/logo_puskesmas.png'),
-                fit: BoxFit.cover,
-              ),
-            ),
-          )
-        ],
-      ),
+      appBar: const CustomAppBarWidget(appBarTitle: 'Home'),
       body: _isLoading
           ? const Center(
               child: CircularProgressIndicator()) // Show loading indicator
-          : _selectedIndex == 0
-              ? SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 7, // Takes 7/8 of the space
-                            child: ProfileCard(
-                              username: _username,
-                              avatarUrl: _avatarUrl,
-                              onTap: () {
-                                Navigator.pushNamed(context, 'profile');
-                              },
-                            ),
-                          ),
-                          Expanded(
-                            flex: 1, // Takes 1/8 of the space
-                            child: SizedBox(
-                              height: 100,
-                              width: 100,
-                              child: Card(
-                                child: IconButton(
-                                  icon: const Icon(Icons.exit_to_app),
-                                  onPressed: _logoutUser,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      BannerWidget(),
-                      const Text('Artikel Populer',
-                          style: AppTextStyle.heading5Bold),
-                      const SizedBox(
-                        height: 268, // Set a height to avoid overflow error
-                        child: ArticlePopular(),
-                      ),
-                      Card(
-                        elevation: 4,
-                        margin: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Container(
-                          width: double
-                              .infinity, // Make the card width match its parent
-                          height: 60, // Set the card height
-                          child: Center(
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.pushNamed(context, 'about');
-                              },
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.info_outline),
-                                  Text(
-                                    '  Tentang Kami',
-                                    style: AppTextStyle.heading5Bold,
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              : ArticlePage(),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: Colors.white,
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        selectedItemColor: successColor,
-        selectedFontSize: 14,
-        unselectedItemColor: Colors.grey[800],
-        unselectedFontSize: 12,
+          : _getBody(),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex: 0,
+        menuItems: _menuItems,
+        routes: _routes,
+        onTap: (index) {
+          Navigator.pushNamed(context, _routes[index]);
+        },
         showSelectedLabels: true,
         showUnselectedLabels: true,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_outlined),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book_outlined),
-            label: 'Artikel',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.food_bank_outlined),
-            label: 'Gizi',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_outlined),
-            label: 'Diskusi',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.medical_services_outlined),
-            label: 'Konsultasi',
-          ),
-        ],
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:stunting_project/components/app_text_styles.dart';
+import 'package:stunting_project/components/colors.dart';
 import '../../../components/input_widgets.dart';
 import '../../../service/auth_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -113,22 +114,16 @@ class _ProfileEditState extends State<ProfileEdit> {
       return;
     }
 
-    if (_oldPasswordController.text.isNotEmpty &&
-        _newPasswordController.text.isEmpty) {
+    if (_newPasswordController.text.isNotEmpty &&
+        _oldPasswordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Password baru tidak boleh kosong')),
-      );
-      return;
-    } else if (_oldPasswordController.text.isEmpty &&
-        _newPasswordController.text.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: const Text('Password lama tidak boleh kosong')),
+        const SnackBar(content: Text('Password lama tidak boleh kosong')),
       );
       return;
     }
 
     final response = await _authService.updateUserProfile(
-      accessToken!, // Menggunakan accessToken yang benar
+      accessToken!,
       _usernameController.text,
       _emailController.text,
       _oldPasswordController.text.isNotEmpty
@@ -137,7 +132,7 @@ class _ProfileEditState extends State<ProfileEdit> {
       _newPasswordController.text.isNotEmpty
           ? _newPasswordController.text
           : null,
-      _profileImageFile, // Pastikan ini adalah file yang dipilih
+      _profileImageFile,
     );
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -209,7 +204,11 @@ class _ProfileEditState extends State<ProfileEdit> {
                   const SizedBox(height: 5),
                   const Text(
                     'Klik untuk mengubah foto',
-                    style: AppTextStyle.body3Regular,
+                    style: AppTextStyle.body3Bold,
+                  ),
+                  const Text(
+                    '(Hanya file JPEG, JPG, dan PNG yang diperbolehkan)',
+                    style: AppTextStyle.body4Regular,
                   ),
                   const SizedBox(height: 5),
                   InputLayoutCus(
@@ -228,6 +227,13 @@ class _ProfileEditState extends State<ProfileEdit> {
                     ),
                   ),
                   const SizedBox(height: 5),
+                  Text(
+                    'Jika anda tidak mau mengganti password, tidak perlu mengisi kolom password',
+                    style: AppTextStyle.body4Bold,
+                  ),
+                  SizedBox(
+                    height: 5,
+                  ),
                   InputLayoutCus(
                     'Password Lama',
                     TextFormField(
@@ -250,6 +256,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 5),
                   InputLayoutCus(
                     'Password Baru',
                     TextFormField(
@@ -304,7 +311,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                           onPressed: _updateUserProfile,
                           style: ButtonStyle(
                             backgroundColor:
-                                WidgetStateProperty.all<Color>(Colors.red),
+                                WidgetStateProperty.all<Color>(successColor),
                             foregroundColor:
                                 WidgetStateProperty.all<Color>(Colors.black),
                             textStyle: WidgetStateProperty.all<TextStyle>(

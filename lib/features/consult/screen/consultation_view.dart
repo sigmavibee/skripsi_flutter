@@ -1,5 +1,7 @@
 // consultation_view.dart
 import 'package:flutter/material.dart';
+import 'package:stunting_project/common/shared_widgets/bottom_nav_bar.dart';
+import 'package:stunting_project/common/shared_widgets/custom_app_bar.dart';
 import 'package:stunting_project/components/app_text_styles.dart';
 import 'package:stunting_project/data/consultation/consultation_models.dart';
 import 'package:stunting_project/service/consultation_service.dart';
@@ -17,6 +19,13 @@ class _ConsultationPageState extends State<ConsultationPage> {
   List<Consultation> _consultations = [];
   bool _isLoading = true;
   String? _errorMessage;
+  final List<String> _routes = [
+    '/',
+    'article',
+    'gizi',
+    'discussion',
+    'consultation',
+  ];
 
   @override
   void initState() {
@@ -46,14 +55,8 @@ class _ConsultationPageState extends State<ConsultationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Konsultasi', style: AppTextStyle.heading4Bold),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context, 0);
-          },
-        ),
+      appBar: const CustomAppBarWidget(
+        appBarTitle: 'Konsultasi',
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -65,6 +68,22 @@ class _ConsultationPageState extends State<ConsultationPage> {
                     return _buildCard(index);
                   },
                 ),
+      bottomNavigationBar: BottomNavBar(
+        menuItems: [
+          'Home',
+          'Article',
+          'Gizi',
+          'Diskusi',
+          'Konsultasi',
+        ],
+        currentIndex: 4,
+        routes: _routes,
+        onTap: (index) {
+          Navigator.pushNamed(context, _routes[index]);
+        },
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+      ),
     );
   }
 

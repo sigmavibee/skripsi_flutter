@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:stunting_project/common/shared_widgets/custom_app_bar.dart';
 import 'package:stunting_project/components/app_text_styles.dart';
 import 'package:stunting_project/components/kelurahan_vars.dart';
 import 'package:stunting_project/data/gizi/gizi_models.dart';
 import 'package:stunting_project/service/gizi_service.dart';
+import '../../../common/shared_widgets/bottom_nav_bar.dart';
 import '../../../data/gizi/children_models.dart';
 import '../../../tokenmanager.dart'; // Pastikan impor ini benar
 
@@ -30,6 +32,13 @@ class _GiziPageState extends State<GiziPage> {
   final TextEditingController nikController = TextEditingController();
   final TextEditingController tinggiController = TextEditingController();
   final TextEditingController beratController = TextEditingController();
+  final List<String> _routes = [
+    '/',
+    'article',
+    'gizi',
+    'discussion',
+    'consultation',
+  ];
 
   final GiziService _giziService = GiziService(); // Instance of GiziService
 
@@ -185,22 +194,8 @@ class _GiziPageState extends State<GiziPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Kalkulator Gizi', style: AppTextStyle.heading4Bold),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.history),
-            onPressed: () {
-              Navigator.pushNamed(context, 'gizihistory');
-            },
-          ),
-        ],
+      appBar: const CustomAppBarWidget(
+        appBarTitle: 'Kalkulator Gizi',
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -304,15 +299,16 @@ class _GiziPageState extends State<GiziPage> {
                         },
                       ),
                     ),
-                    ElevatedButton(onPressed: _cekUmur, child: Text('Cek Umur'))
+                    ElevatedButton(
+                        onPressed: _cekUmur, child: const Text('Cek Umur'))
                   ],
                 ),
-                SizedBox(height: 16),
+                const SizedBox(height: 16),
                 Text(
                   'Umur Balita :' + ageBabyText,
                   style: AppTextStyle.body2Regular,
                 ),
-                SizedBox(
+                const SizedBox(
                   height: 16,
                 ),
                 AbsorbPointer(
@@ -449,10 +445,33 @@ class _GiziPageState extends State<GiziPage> {
                     onPressed: _submitForm,
                     child: const Text('Hitung Status Gizi'),
                   ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamed(context, 'gizihistory');
+                  },
+                  child: const Text('Riwayat Status Gizi'),
+                ),
               ],
             ),
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavBar(
+        currentIndex:
+            2, // assuming the discussion page is the 3rd item in the menu
+        menuItems: [
+          'Home',
+          'Article',
+          'Gizi',
+          'Diskusi',
+          'Konsultasi',
+        ],
+        routes: _routes,
+        onTap: (index) {
+          Navigator.pushNamed(context, _routes[index]);
+        },
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
       ),
     );
   }

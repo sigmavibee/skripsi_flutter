@@ -13,7 +13,7 @@ class _AboutPageState extends State<AboutPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Puskesmas Dukuhseti'),
+        title: const Text('Puskesmas Dukuhseti'),
         centerTitle: true,
       ),
       body: Padding(
@@ -22,25 +22,25 @@ class _AboutPageState extends State<AboutPage> {
           children: [
             Image.asset('assets/dukuhseti.png'),
             const SizedBox(height: 16),
-            Text(
+            const Text(
               'Tentang Puskesmas Dukuhseti',
               style: AppTextStyle.body3Bold,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            Text(
+            const Text(
               'UPT Puskesmas Dukuhseti merupakan suatu kesatuan organisasi kesehatan fungsional yang merupakan pusat pengembangan kesehatan masyarakat yang juga berfungsi memberi pelayanan secara menyeluruh dan terpadu kepada masyarakat di kecamatan Dukuhseti.',
               style: AppTextStyle.body4Regular,
               textAlign: TextAlign.justify,
             ),
             const SizedBox(height: 16),
-            Text(
+            const Text(
               'Lokasi',
               style: AppTextStyle.body3Bold,
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            Text(
+            const Text(
               'Puskesmas Dukuhseti terletak di Kecamatan Dukuhseti yang berjarak 37 km dari pusat kota Pati.',
               style: AppTextStyle.body4Regular,
               textAlign: TextAlign.justify,

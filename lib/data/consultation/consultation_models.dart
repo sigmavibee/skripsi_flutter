@@ -29,8 +29,6 @@ class Consultation {
         createdAt: json['created_at'] as String,
       );
     } catch (e) {
-      print('Error in Consultation.fromJson: $e');
-      print('JSON data: $json');
       rethrow;
     }
   }
