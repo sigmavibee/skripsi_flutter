@@ -2,4 +2,5 @@
 
 A new Flutter project.
 
-SOON JADILAH WOI WKWKW
+-- REFERENCE FOR NEXT DUMMY PROJECT
+--
